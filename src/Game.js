@@ -6,7 +6,6 @@ class Game {
     this.objects = [];
     this.names = {};
     this.mouse = new THREE.Vector2();
-
     this.mouseMoveEvent = window.addEventListener('mousemove', (event) => {
       this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
@@ -51,6 +50,12 @@ class Game {
       return true;
     } else {
       return false;
+    }
+  }
+
+  destroyAll() {
+    for (let obj of this.objects) {
+      obj.destroy();
     }
   }
 }

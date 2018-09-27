@@ -1,13 +1,8 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
-import GameObject from '../generics/GameObject';
-import { timeStep } from '../globals';
-import keypressed from '../keypressed';
 import { OrbitControls } from 'three-full';
 
-class Camera extends GameObject {
-  constructor(game, name) {
-    super(game, name);
+class Camera {
+  constructor() {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 
@@ -17,11 +12,9 @@ class Camera extends GameObject {
     this.frustum = new THREE.Frustum();
     this.cameraViewProjectionMatrix = new THREE.Matrix4();
 
-    this.camera.name = this.name;
+    this.camera.name = 'MainCamera';
 
     const orbitControls = new OrbitControls(this.camera);
-
-    this.loaded = true;
   }
 
   pointIsOnCamera(point) {

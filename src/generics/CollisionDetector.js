@@ -16,7 +16,10 @@ class CollisionDetector {
       const directionBundle = directions[directionIndex];
       const direction = directionBundle[0];
       const distance = directionBundle[1];
-      const raycaster = new THREE.Raycaster(origin, direction.clone().normalize(), 0, distance);
+
+      const position = origin.clone();
+      position.add(this.parent.game.scene.position);
+      const raycaster = new THREE.Raycaster(position, direction.clone().normalize(), 0, distance);
 
       for (let mesh of meshes) {
         if (mesh) {

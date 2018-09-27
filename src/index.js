@@ -1,41 +1,38 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
 import './extensions';
-import Ball from './objects/ball';
-import Background from './objects/background';
-import Game from './Game';
-import Walls from './objects/walls';
-import Brick from './objects/brick';
-import LevelLoader from './objects/levelLoader';
-
-import BallCreator from './objects/ballCreator';
 import { timeStep, updatesPerTimestep } from './globals'
 import Camera from './objects/camera';
-import { STATES } from './globals';
 import { getUrlVars } from './util';
+import Level from './Level';
 
+const levelNr = getUrlVars()['level'] || 0;
+const WORLD = {};
 const scene = new THREE.Scene();
 scene.name = 'MainScene';
-
-// For threejs chrome dev tools
 window.THREE = THREE;
 window.scene = scene;
-const game = new Game(scene);
-window.game = game;
-window.run = () => {
-    if (game.state === STATES.RUNNING) {
-        game.changeState(STATES.PLACING);
-    } else {
-        game.changeState(STATES.RUNNING);
-    }
-}
+window.WORLD = WORLD;
+WORLD.scene = scene;
+
+const cubeTexture = new THREE.CubeTextureLoader()
+    .setPath('dist/textures/cube/skybox/')
+    .load([
+        'px.jpg',
+        'nx.jpg',
+        'py.jpg',
+        'ny.jpg',
+        'pz.jpg',
+        'nz.jpg'
+    ]);
+scene.background = cubeTexture;
+
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth - 4, window.innerHeight - 4);
 document.body.appendChild(renderer.domElement);
+WORLD.renderer = renderer;
 
-const camera = new Camera(game, 'MainCamera');
-camera.id = 'camera';
-game.add(camera);
+const camera = new Camera();
+WORLD.camera = camera;
 
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -43,27 +40,28 @@ window.addEventListener('resize', () => {
     camera.camera.updateProjectionMatrix();
 });
 
-const background = new Background(game, 'Background');
-game.add(background);
+const level = new Level(levelNr);
+const level2 = new Level(2, new THREE.Vector3(-300, 0, 0));
+const levels = [level, level2]; // TODO add more levels
 
-const walls = new Walls(game, 'Walls');
-game.add(walls);
+window.run = () => {
+    for (let lvl of levels) {
+        lvl.run();
+    }    
+}
 
-// const brick = new Brick(game, 'Brick');
-// game.add(brick);
+window.pause = () => {
+    for (let lvl of levels) {
+        lvl.pause();
+    }    
+}
 
-const level = getUrlVars()['level'] || 0;
-const levelLoader = new LevelLoader(game, 'LevelLoader', level);
-game.add(levelLoader);
+window.reset = () => {
+    for (let lvl of levels) {
+        lvl.reset();
+    }    
+}
 
-const ballCreator = new BallCreator(game, 'BallCreator');
-ballCreator.id = 'ballCreator';
-game.add(ballCreator);
-
-// const ball = new Ball(game);
-// game.add(ball);
-
-const maxSubSteps = 10;
 let lastTime;
 let delta = 0;
 // TODO fix gameloop to make update at fixed timestep - https://isaacsukin.com/news/2015/01/detailed-explanation-javascript-game-loops-and-timing
@@ -81,10 +79,9 @@ function mainLoop(time) {
     if (delta >= timeStep) {
         delta -= timeStep;
         for (let i = 0; i < updatesPerTimestep; i++) {
-            for (let obj of game.objects) {
-                if (obj.update && obj.loaded == true) {
-                    obj.update();
-                }
+            camera.update();
+            for (let level of levels) {
+                level.update();
             }
         }
     }
