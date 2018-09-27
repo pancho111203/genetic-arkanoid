@@ -29,7 +29,8 @@ class Brick extends GameObject {
     const rgbCodes = COLOR_MAP[tileType];
     const material = new THREE.MeshBasicMaterial( {color: new THREE.Color(`rgb(${rgbCodes[0]}, ${rgbCodes[1]}, ${rgbCodes[2]})`)} );
     const brick = new THREE.Mesh( geometry, material );
-    
+    brick.userData.groups = ['ballCollisions', 'destroyable'];
+
     if (startPositionTopLeft) {
       brick.position.set(startPositionTopLeft.x + BRICK_WIDTH/2, startPositionTopLeft.y - BRICK_HEIGHT/2, startPositionTopLeft.z);
     }

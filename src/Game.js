@@ -1,12 +1,10 @@
 import { STATES } from './globals';
 
 class Game {
-  constructor(scene, world) {
+  constructor(scene) {
     this.scene = scene;
-    this.world = world;
     this.objects = [];
     this.names = {};
-    this.groups = {};
     this.mouse = new THREE.Vector2();
 
     this.mouseMoveEvent = window.addEventListener('mousemove', (event) => {
@@ -29,26 +27,7 @@ class Game {
       this.names[obj.id] = this.objects.length;
     }
 
-    if (obj.groups) {
-      for (let group of obj.groups) {
-        if (this.groups[group] !== undefined) {
-          this.groups[group].push(this.objects.length);
-        } else {
-          this.groups[group] = [this.objects.length];
-        }
-      }
-    }
     this.objects.push(obj);
-  }
-
-  getObjectsInGroups(groups) {
-    const indices = [];
-    for (let group of groups) {
-      if (this.groups[group]) {
-        indices.push(...this.groups[group]);        
-      }
-    }
-    return indices.map((index) => { return this.objects[index]; })
   }
 
   getObjectByName(name) {
@@ -69,15 +48,6 @@ class Game {
         delete this.names[object.id];
       }
 
-      if (object.groups) {
-        for (let groupName of object.groups) {
-          const group = this.groups[groupName];
-          const indexOnGrp = group.indexOf(index);
-          if (indexOnGrp !== -1) {
-            group.splice(indexOnGrp, 1);
-          }
-        }
-      }
       return true;
     } else {
       return false;

@@ -34,7 +34,6 @@ class LevelLoader extends GameObject {
   
           const startPosition = new THREE.Vector3(startX + x * tileWidth, startY - y * tileHeight, 0); // top left corner of where the brick should be painted
           const brick = new Brick(this.game, 'Brick', startPosition, tileType);
-          brick.groups = ['ballCollisions', 'destroyable'];
           this.game.add(brick);
         }
       }

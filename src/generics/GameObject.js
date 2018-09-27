@@ -12,15 +12,16 @@ class GameObject {
     return this.id === id;
   }
 
-  isOfGroup(group) {
-    if (this.groups) {
-      return ~this.groups.indexOf(group);
-    }
-    return false;
-  }
+  // isOfGroup(group) {
+  //   if (this.groups) {
+  //     return ~this.groups.indexOf(group);
+  //   }
+  //   return false;
+  // }
 
   loadMeshToScene(mesh) {
     this.mesh = mesh;
+    this.mesh.userData.gameObject = this;
     this.mesh.name = this.name;
     this.game.scene.add(mesh);
   }

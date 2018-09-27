@@ -51,6 +51,8 @@ class Walls extends GameObject {
       bottom.position.y = wallsGroup.position.y - (WALLS_HEIGHT / 2 - WALLS_THICKNESS / 2);
       wallsGroup.add(bottom);
 
+      wallsGroup.userData.groups = ['ballCollisions'];
+
       this.loadMeshToScene(wallsGroup);
       this.loaded = true;
     });

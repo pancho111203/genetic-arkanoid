@@ -8,7 +8,7 @@ class CollisionDetector {
     }
   }
 
-  checkCollisions(origin, directions, objects, recursive=true) {
+  checkCollisions(origin, directions, meshes, recursive=true) {
     const isColliding = Array(directions.length).fill(false);
     const collisionObjects = Array(directions.length).fill([]);
 
@@ -18,12 +18,12 @@ class CollisionDetector {
       const distance = directionBundle[1];
       const raycaster = new THREE.Raycaster(origin, direction.clone().normalize(), 0, distance);
 
-      for (let obj of objects) {
-        if (obj && obj.mesh) {
-          const collisionResults = raycaster.intersectObject(obj.mesh, recursive);
+      for (let mesh of meshes) {
+        if (mesh) {
+          const collisionResults = raycaster.intersectObject(mesh, recursive);
 
           if (collisionResults.length > 0 && collisionResults[0].distance < distance) {
-            collisionObjects[directionIndex].push(obj);
+            collisionObjects[directionIndex].push(mesh);
             isColliding[directionIndex] = true;
           }
         }

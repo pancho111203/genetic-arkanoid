@@ -3,10 +3,11 @@ import ResourceLoader from '../ResourceLoader';
 import GameObject from '../generics/GameObject';
 import { STATES, debug } from '../globals';
 import Ball from './ball';
+import { tileHeight, tileWidth, tileDepth, wallWidth, nTilesV, nTilesH } from '../globals';
 
-const START_POSITION_Y = -20;
-const PLANE_WIDTH = 85;
+const PLANE_WIDTH = (nTilesH * tileWidth);
 const PLANE_HEIGHT = 45;
+const START_POSITION_Y = (-(nTilesV * tileHeight) / 2) + PLANE_HEIGHT / 2;
 
 const PHASES = {
   POSITION: 0,
@@ -41,16 +42,17 @@ class BallCreator extends GameObject {
     }, false);
 
     const geometry = new THREE.PlaneGeometry(PLANE_WIDTH, PLANE_HEIGHT);
-    const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const material = new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.DoubleSide });
 
     if (!debug) {
       material.visible = false;
     }
     const creatorPlane = new THREE.Mesh(geometry, material);
     creatorPlane.position.y = START_POSITION_Y;
-    this.loadMeshToScene(creatorPlane);
-    this.loaded = true;
 
+    this.plane = new THREE.Plane(new THREE.Vector3(0, 0, -1));
+
+    this.loadMeshToScene(creatorPlane);
     this.loaded = true;
   }
 
@@ -58,10 +60,9 @@ class BallCreator extends GameObject {
     if (this.game.state === STATES.PLACING && this.mesh && this.phase === PHASES.ROTATION && this.currentPlacingBall !== null && this.currentPlacingBall.loaded) {
       const raycaster = new THREE.Raycaster()
       raycaster.setFromCamera(this.game.mouse, this.game.getObjectByName('camera').camera)
-      const intersections = raycaster.intersectObject(this.mesh);
-      if (intersections && intersections.length > 0) {
-        const intersectionPoint = intersections[0].point;
-        const directionVector = intersectionPoint.sub(this.currentPlacingBall.mesh.position).normalize();
+      const intersection = raycaster.ray.intersectPlane(this.plane);
+      if (intersection) {
+        const directionVector = intersection.sub(this.currentPlacingBall.mesh.position).normalize();
         this.currentPlacingBall.direction = directionVector;
       }
     }

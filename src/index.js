@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon';
+import './extensions';
 import Ball from './objects/ball';
 import Background from './objects/background';
 import Game from './Game';
@@ -8,14 +9,10 @@ import Brick from './objects/brick';
 import LevelLoader from './objects/levelLoader';
 
 import BallCreator from './objects/ballCreator';
-import { timeStep, gravity, updatesPerTimestep } from './globals'
+import { timeStep, updatesPerTimestep } from './globals'
 import Camera from './objects/camera';
 import { STATES } from './globals';
 import { getUrlVars } from './util';
-
-const world = new CANNON.World();
-world.gravity.set(gravity.x, gravity.y, gravity.z);
-world.broadphase = new CANNON.NaiveBroadphase();
 
 const scene = new THREE.Scene();
 scene.name = 'MainScene';
@@ -23,7 +20,7 @@ scene.name = 'MainScene';
 // For threejs chrome dev tools
 window.THREE = THREE;
 window.scene = scene;
-const game = new Game(scene, world);
+const game = new Game(scene);
 window.game = game;
 window.run = () => {
     if (game.state === STATES.RUNNING) {
@@ -50,23 +47,21 @@ const background = new Background(game, 'Background');
 game.add(background);
 
 const walls = new Walls(game, 'Walls');
-walls.groups = ['ballCollisions'];
 game.add(walls);
 
 // const brick = new Brick(game, 'Brick');
-// brick.groups = ['ballCollisions', 'destroyable'];
 // game.add(brick);
 
 const level = getUrlVars()['level'] || 0;
 const levelLoader = new LevelLoader(game, 'LevelLoader', level);
 game.add(levelLoader);
 
-// const ballCreator = new BallCreator(game, 'BallCreator');
-// ballCreator.id = 'ballCreator';
-// game.add(ballCreator);
+const ballCreator = new BallCreator(game, 'BallCreator');
+ballCreator.id = 'ballCreator';
+game.add(ballCreator);
 
-const ball = new Ball(game);
-game.add(ball);
+// const ball = new Ball(game);
+// game.add(ball);
 
 const maxSubSteps = 10;
 let lastTime;
@@ -86,8 +81,6 @@ function mainLoop(time) {
     if (delta >= timeStep) {
         delta -= timeStep;
         for (let i = 0; i < updatesPerTimestep; i++) {
-            //        game.world.step(timeStep, dt, maxSubSteps);
-
             for (let obj of game.objects) {
                 if (obj.update && obj.loaded == true) {
                     obj.update();

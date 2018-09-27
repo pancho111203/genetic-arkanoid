@@ -88,7 +88,7 @@ class Ball extends GameObject {
         [[new THREE.Vector3(-1, 0, 0), BALL_RADIUS],
         [new THREE.Vector3(1, 0, 0), BALL_RADIUS], 
         [new THREE.Vector3(0, -1, 0), BALL_RADIUS],
-        [new THREE.Vector3(0, 1, 0), BALL_RADIUS]], this.game.getObjectsInGroups(['ballCollisions']))
+        [new THREE.Vector3(0, 1, 0), BALL_RADIUS]], this.game.scene.getObjectsOfGroups(['ballCollisions']))
 
       if (collidesLeft || collidesRight) {
         this.direction.x = -this.direction.x;
@@ -104,7 +104,7 @@ class Ball extends GameObject {
       // TODO limit colObjs to UNIQUE objects (to avoid repeating check 4 times)
       for (let colObj of colObjs) {
         if (colObj.isOfGroup('destroyable')) {
-          this.game.destroy(colObj);
+          this.game.destroy(colObj.userData.gameObject);
         }
       }
     } else {
