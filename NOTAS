@@ -1,0 +1,7 @@
+TODO
+  Refactorings:
+    - los 'groups' usados para collisions deberian ser propiedad de Mesh o THREE.Group, no de GameObject, ya que un object puede tener varios meshes y algunos perteneccer a un grupo mientras que otrso no
+    - con el sistema que monte de game es dificil mantener una estructura de objetos en la escena 
+      - p ejemplo que todos los bricks esten en un grupo creado por levelloader
+      - deberia aprovechar la estructura de threejs y no replicarlo con mi gameObject + this.mesh
+      - el mayor fallo esta en estandarizar el uso de loadMeshToScene para cada gameobject ya que muchos meshs no se quieren aadir directamente ala escena sino a un parent
