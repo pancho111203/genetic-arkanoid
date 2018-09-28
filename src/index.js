@@ -40,9 +40,16 @@ window.addEventListener('resize', () => {
     camera.camera.updateProjectionMatrix();
 });
 
-const level = new Level(levelNr);
-const level2 = new Level(2, new THREE.Vector3(-300, 0, 0));
-const levels = [level, level2]; // TODO add more levels
+const level = new Level(levelNr, new THREE.Vector3(-2, 0, 0));
+const levels = [level]; // TODO add more levels
+
+// const levels = [];
+// for (let i = 0; i < 20; i++) {
+//     const x = i % 5;
+//     const y = Math.floor(i/5);
+//     const level = new Level(i, new THREE.Vector3(-120 * x, 150 * y, 0));
+//     levels.push(level);
+// }
 
 window.run = () => {
     for (let lvl of levels) {

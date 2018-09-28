@@ -4,7 +4,7 @@ export const STATES = {
   PLACING: 0,
   RUNNING: 1
 } 
-export const debug = true;
+export const debug = false;
 
 export const tileHeight = 5;
 export const tileWidth = 10;
