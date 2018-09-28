@@ -48,12 +48,12 @@ class Level {
     this.levelLoader = new LevelLoader(this.game, 'LevelLoader', this.levelNr);
     this.game.add(this.levelLoader);
 
-    // this.ballCreator = new BallCreator(this.game, 'BallCreator');
-    // this.ballCreator.id = 'ballCreator';
-    // this.game.add(this.ballCreator);
+    this.ballCreator = new BallCreator(this.game, 'BallCreator');
+    this.ballCreator.id = 'ballCreator';
+    this.game.add(this.ballCreator);
 
-    this.ball = new Ball(this.game);
-    this.game.add(this.ball);
+    // this.ball = new Ball(this.game);
+    // this.game.add(this.ball);
   }
 
   initScene() {

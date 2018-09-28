@@ -5,6 +5,8 @@ import Camera from './objects/camera';
 import { getUrlVars } from './util';
 import Level from './Level';
 
+const RENDERING = true;
+
 const levelNr = getUrlVars()['level'] || 0;
 const WORLD = {};
 const scene = new THREE.Scene();
@@ -54,19 +56,19 @@ const levels = [level]; // TODO add more levels
 window.run = () => {
     for (let lvl of levels) {
         lvl.run();
-    }    
+    }
 }
 
 window.pause = () => {
     for (let lvl of levels) {
         lvl.pause();
-    }    
+    }
 }
 
 window.reset = () => {
     for (let lvl of levels) {
         lvl.reset();
-    }    
+    }
 }
 
 let lastTime;
@@ -93,7 +95,14 @@ function mainLoop(time) {
         }
     }
 
-    renderer.render(scene, camera.camera);
+    if (RENDERING) {
+        renderer.render(scene, camera.camera);
+    } else {
+        scene.updateMatrixWorld();
+        camera.camera.updateMatrixWorld();
+        camera.camera.matrixWorldInverse.getInverse(camera.camera.matrixWorld);    
+    }
+
     lastTime = time;
 }
 
