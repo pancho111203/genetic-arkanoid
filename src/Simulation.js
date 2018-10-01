@@ -48,6 +48,12 @@ class Simulation {
       });
     }
 
+    this.setLevels();
+    
+    requestAnimationFrame((time) => this.mainLoop(time));
+  }
+
+  setLevels() {
     this.levels = [];
     for (let i = 0; i < this.levelConfigurations.length; i++) {
       const levelConfiguration = this.levelConfigurations[i];
@@ -59,9 +65,8 @@ class Simulation {
       const level = new Level(this, levelNr, new THREE.Vector3(-120 * x, 150 * y, 0), balls);
       this.levels.push(level);
     }
-
-    requestAnimationFrame((time) => this.mainLoop(time));
   }
+
   // TODO fix gameloop to make update at fixed timestep - https://isaacsukin.com/news/2015/01/detailed-explanation-javascript-game-loops-and-timing
   // TODO implement way of making update much quicker for genetic simulations
   mainLoop(time) {
@@ -115,6 +120,16 @@ class Simulation {
     for (let lvl of this.levels) {
       lvl.reset();
     }
+  }
+
+  changeLevels(levelConfigurations) {
+    this.levelConfigurations = levelConfigurations;
+
+    for (let lvl of this.levels) {
+      lvl.destroy();
+    }
+
+    this.setLevels();
   }
 }
 

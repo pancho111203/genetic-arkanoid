@@ -13,8 +13,7 @@ class Level {
     this.position = position;
     this.levelNr = levelNr;
     this.parentSimulation = simulation;
-    this.initScene();
-    this.initGame();
+    this.start();
   }
 
   update() {
@@ -34,10 +33,17 @@ class Level {
   }
 
   reset() {
+    this.destroy();
+    this.start();
+  }
+
+  destroy() {
     this.parentSimulation.scene.remove(this.scene);
     this.scene = null;
     this.game = null;
+  }
 
+  start() {
     this.initScene();
     this.initGame();
   }
