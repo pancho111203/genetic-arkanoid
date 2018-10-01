@@ -6,11 +6,12 @@ import GeneticBridge from './GeneticBridge';
 const levelNr = getUrlVars()['level'] || 0;
 const trackedConfigurations = [];
 
-const renderedSimulation = new Simulation(true, [
-    {
-        levelNr: levelNr
-    }
-]);
+const demoConfig = [{
+    levelNr: 20,
+    balls: [[[-34.09, -27.18, 0], [-0.67, 0.74, 0]]]
+}];
+
+const renderedSimulation = new Simulation(true, demoConfig);
 
 function renderTrackedConfig(index) {
     const config = trackedConfigurations[index];

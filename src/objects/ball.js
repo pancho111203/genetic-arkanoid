@@ -92,12 +92,10 @@ class Ball extends GameObject {
 //      console.log(collidesLeft, collidesRight, collidesDown, collidesUp);
       if (collidesLeft || collidesRight) {
         this.direction.x = -this.direction.x;
-        console.log('collidesH');
       }
 
       if (collidesDown || collidesUp) {
         this.direction.y = -this.direction.y
-        console.log('collidesV');
       }
 
       this.mesh.position.add(this.direction);

@@ -22,9 +22,10 @@ const COLOR_MAP = [
 ]
 
 class Brick extends GameObject {
-  constructor(game, name, startPositionTopLeft, tileType) {
+  constructor(game, name, startPositionTopLeft, tileType, onDestroyedCb) {
     super(game, name);
-
+    this.onDestroyedCb = onDestroyedCb;
+    
     const geometry = new THREE.BoxGeometry(BRICK_WIDTH, BRICK_HEIGHT, BRICK_DEPTH);
     const rgbCodes = COLOR_MAP[tileType];
     const material = new THREE.MeshBasicMaterial( {color: new THREE.Color(`rgb(${rgbCodes[0]}, ${rgbCodes[1]}, ${rgbCodes[2]})`)} );
@@ -37,6 +38,16 @@ class Brick extends GameObject {
     
     this.loadMeshToScene(brick);
     this.loaded = true;
+  }
+
+  destroy() {
+    if (this.mesh) {
+      if (this.onDestroyedCb) {
+        this.onDestroyedCb();
+      }
+      
+      this.game.scene.remove(this.mesh);
+    }
   }
 }
 
