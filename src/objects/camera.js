@@ -3,6 +3,10 @@ import { OrbitControls } from 'three-full';
 
 class Camera {
   constructor() {
+    if (!window || !process.browser) {
+      throw new Error('Cant create a camera if not in a browser environment (without rendering)');
+    }
+    
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 

@@ -3,13 +3,16 @@ import Game from './Game';
 import Walls from './objects/walls';
 import LevelLoader from './objects/levelLoader';
 import BallCreator from './objects/ballCreator';
+import BallSetter from './objects/ballSetter';
 import Ball from './objects/ball';
 import { STATES } from './globals';
 
 class Level {
-  constructor(levelNr, position) {
+  constructor(simulation, levelNr, position, ballsConfiguration) {
+    this.ballsConfiguration = ballsConfiguration;
     this.position = position;
     this.levelNr = levelNr;
+    this.parentSimulation = simulation;
     this.initScene();
     this.initGame();
   }
@@ -31,7 +34,7 @@ class Level {
   }
 
   reset() {
-    window.WORLD.scene.remove(this.scene);
+    this.parentSimulation.scene.remove(this.scene);
     this.scene = null;
     this.game = null;
 
@@ -40,7 +43,7 @@ class Level {
   }
 
   initGame() {
-    this.game = new Game(this.scene);
+    this.game = new Game(this.parentSimulation, this.scene);
 
     this.walls = new Walls(this.game, 'Walls');
     this.game.add(this.walls);
@@ -48,9 +51,17 @@ class Level {
     this.levelLoader = new LevelLoader(this.game, 'LevelLoader', this.levelNr);
     this.game.add(this.levelLoader);
 
-    this.ballCreator = new BallCreator(this.game, 'BallCreator');
-    this.ballCreator.id = 'ballCreator';
-    this.game.add(this.ballCreator);
+    if (this.parentSimulation.rendering) {
+      this.ballCreator = new BallCreator(this.game, 'BallCreator');
+      this.ballCreator.id = 'ballCreator';
+      this.game.add(this.ballCreator);
+    }
+
+    if (this.ballsConfiguration !== undefined) {
+      this.ballSetter = new BallSetter(this.game, 'BallSetter', this.ballsConfiguration);
+      this.ballSetter.id = 'ballSetter';
+      this.game.add(this.ballSetter);
+    }
 
     // this.ball = new Ball(this.game);
     // this.game.add(this.ball);
@@ -66,7 +77,7 @@ class Level {
     }
 
 
-    window.WORLD.scene.add(this.scene);
+    this.parentSimulation.scene.add(this.scene);
   }
 }
 

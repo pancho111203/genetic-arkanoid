@@ -24,7 +24,7 @@ function keydown(e) {
 
 reset()
 
-if (process.browser) {
+if (process.browser && window) {
   window.addEventListener('keydown', keydown, false)
   window.addEventListener('keyup', keyup, false)
   window.addEventListener('blur', reset, false)

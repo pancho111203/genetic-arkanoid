@@ -1,16 +1,20 @@
+import * as THREE from 'three';
 import { STATES } from './globals';
 
 class Game {
-  constructor(scene) {
+  constructor(parentSimulation, scene) {
+    this.parentSimulation = parentSimulation;
     this.scene = scene;
     this.objects = [];
     this.names = {};
     this.mouse = new THREE.Vector2();
-    this.mouseMoveEvent = window.addEventListener('mousemove', (event) => {
-      this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      this.mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-    });
-    
+    if (this.parentSimulation.isRendering() && window) {
+      this.mouseMoveEvent = window.addEventListener('mousemove', (event) => {
+        this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+      });
+    }
+
     this.state = STATES.PLACING;
   }
 

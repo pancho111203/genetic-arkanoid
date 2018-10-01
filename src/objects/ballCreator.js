@@ -17,6 +17,9 @@ const PHASES = {
 class BallCreator extends GameObject {
   constructor(game, name) {
     super(game, name);
+    if (!window || !process.browser) {
+      throw new Error('Cant create a BallCreator if not in a browser environment (without rendering)');
+    }
 
     this.phase = PHASES.POSITION;
     this.currentPlacingBall = null;
@@ -29,16 +32,19 @@ class BallCreator extends GameObject {
       if (this.game.state === STATES.PLACING && this.mesh) {
         if (this.phase === PHASES.POSITION) {
           const raycaster = new THREE.Raycaster()
-          raycaster.setFromCamera(mouse, window.WORLD.camera.camera)
+          raycaster.setFromCamera(mouse, this.game.parentSimulation.camera.camera)
           const intersections = raycaster.intersectObject(this.mesh);
           if (intersections && intersections.length > 0) {
             const intersectionPoint = intersections[0].point;
-            const ball = new Ball(game, 'Ball', undefined, intersectionPoint.sub(this.game.scene.position));
+            intersectionPoint.sub(this.game.scene.position);
+            console.log(intersectionPoint);
+            const ball = new Ball(game, 'Ball', undefined, intersectionPoint);
             this.game.add(ball);
             this.phase = PHASES.ROTATION;
             this.currentPlacingBall = ball;
           }
         } else {
+          console.log(this.currentPlacingBall.direction);
           this.phase = PHASES.POSITION;
           this.currentPlacingBall = null;
         }
@@ -63,7 +69,7 @@ class BallCreator extends GameObject {
   update() {
     if (this.game.state === STATES.PLACING && this.mesh && this.phase === PHASES.ROTATION && this.currentPlacingBall !== null && this.currentPlacingBall.loaded) {
       const raycaster = new THREE.Raycaster()
-      raycaster.setFromCamera(this.game.mouse, window.WORLD.camera.camera)
+      raycaster.setFromCamera(this.game.mouse, this.game.parentSimulation.camera.camera)
       const intersection = raycaster.ray.intersectPlane(this.plane);
       if (intersection) {
         intersection.sub(this.game.scene.position); // make relative to current scene

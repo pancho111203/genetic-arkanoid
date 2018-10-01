@@ -28,7 +28,7 @@ class Ball extends GameObject {
 
     //    const geometry = new THREE.CylinderGeometry(10, 10, 30);
     const geometry = new THREE.SphereGeometry(BALL_RADIUS, BALL_WIDTH_SEGMENTS, BALL_HEIGHT_SEGMENTS);
-    const material = new THREE.MeshBasicMaterial({ color: color, envMap: window.WORLD.scene.background });
+    const material = new THREE.MeshBasicMaterial({ color: color, envMap: game.parentSimulation.scene.background });
     const ball = new THREE.Mesh(geometry, material);
 
     this.arrowGrp = new THREE.Group();
