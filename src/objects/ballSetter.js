@@ -12,8 +12,8 @@ console.log(PLANE_WIDTH, PLANE_HEIGHT, START_POSITION_Y);
 
 
 class BallSetter extends GameObject {
-  constructor(game, name, ballsConfiguration) {
-    super(game, name);
+  constructor(level, name, ballsConfiguration) {
+    super(level, name);
 
     for (let ballConfiguration of ballsConfiguration) {
       const ballPosition = new THREE.Vector3(ballConfiguration[0][0], ballConfiguration[0][1], ballConfiguration[0][2]);
@@ -21,8 +21,8 @@ class BallSetter extends GameObject {
 
       const validation = this.validateBallConfiguration(ballPosition, ballDirection);
       if(validation === null) {
-        const ball = new Ball(game, 'Ball', ballDirection, ballPosition);
-        this.game.add(ball);
+        const ball = new Ball(this.level, 'Ball', ballDirection, ballPosition);
+        this.level.game.add(ball);
       } else {
         console.error('Tried to add invalid ball configuration: ' + validation);
         console.error(ballConfiguration);

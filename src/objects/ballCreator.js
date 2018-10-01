@@ -15,8 +15,8 @@ const PHASES = {
 };
 
 class BallCreator extends GameObject {
-  constructor(game, name) {
-    super(game, name);
+  constructor(level, name) {
+    super(level, name);
     if (!window || !process.browser) {
       throw new Error('Cant create a BallCreator if not in a browser environment (without rendering)');
     }
@@ -29,17 +29,17 @@ class BallCreator extends GameObject {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-      if (this.game.state === STATES.PLACING && this.mesh) {
+      if (this.level.game.state === STATES.PLACING && this.mesh) {
         if (this.phase === PHASES.POSITION) {
           const raycaster = new THREE.Raycaster()
-          raycaster.setFromCamera(mouse, this.game.parentSimulation.camera.camera)
+          raycaster.setFromCamera(mouse, this.level.parentSimulation.camera.camera)
           const intersections = raycaster.intersectObject(this.mesh);
           if (intersections && intersections.length > 0) {
             const intersectionPoint = intersections[0].point;
-            intersectionPoint.sub(this.game.scene.position);
+            intersectionPoint.sub(this.level.scene.position);
             console.log(intersectionPoint);
-            const ball = new Ball(game, 'Ball', undefined, intersectionPoint);
-            this.game.add(ball);
+            const ball = new Ball(this.level, 'Ball', undefined, intersectionPoint);
+            this.level.game.add(ball);
             this.phase = PHASES.ROTATION;
             this.currentPlacingBall = ball;
           }
@@ -67,12 +67,12 @@ class BallCreator extends GameObject {
   }
 
   update() {
-    if (this.game.state === STATES.PLACING && this.mesh && this.phase === PHASES.ROTATION && this.currentPlacingBall !== null && this.currentPlacingBall.loaded) {
+    if (this.level.game.state === STATES.PLACING && this.mesh && this.phase === PHASES.ROTATION && this.currentPlacingBall !== null && this.currentPlacingBall.loaded) {
       const raycaster = new THREE.Raycaster()
-      raycaster.setFromCamera(this.game.mouse, this.game.parentSimulation.camera.camera)
+      raycaster.setFromCamera(this.level.game.mouse, this.level.parentSimulation.camera.camera)
       const intersection = raycaster.ray.intersectPlane(this.plane);
       if (intersection) {
-        intersection.sub(this.game.scene.position); // make relative to current scene
+        intersection.sub(this.level.scene.position); // make relative to current scene
         const directionVector = intersection.sub(this.currentPlacingBall.mesh.position).normalize();
         this.currentPlacingBall.direction = directionVector;
       }
@@ -81,7 +81,7 @@ class BallCreator extends GameObject {
 
   destroy() {
     if (this.mesh) {
-      this.game.scene.remove(this.mesh);
+      this.level.scene.remove(this.mesh);
     }
     window.removeEventListener('click', this.clickEvent);
   }

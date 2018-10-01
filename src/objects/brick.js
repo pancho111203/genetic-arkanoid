@@ -22,8 +22,9 @@ const COLOR_MAP = [
 ]
 
 class Brick extends GameObject {
-  constructor(game, name, startPositionTopLeft, tileType, onDestroyedCb) {
-    super(game, name);
+  constructor(level, name, startPositionTopLeft, tileType, onDestroyedCb) {
+    super(level, name);
+
     this.onDestroyedCb = onDestroyedCb;
     
     const geometry = new THREE.BoxGeometry(BRICK_WIDTH, BRICK_HEIGHT, BRICK_DEPTH);
@@ -42,11 +43,13 @@ class Brick extends GameObject {
 
   destroy() {
     if (this.mesh) {
+      this.level.metrics.brickDestroyed();
+
       if (this.onDestroyedCb) {
         this.onDestroyedCb();
       }
       
-      this.game.scene.remove(this.mesh);
+      this.level.scene.remove(this.mesh);
     }
   }
 }

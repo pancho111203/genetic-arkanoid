@@ -9,8 +9,8 @@ const WALLS_DEPTH = tileDepth;
 const WALLS_THICKNESS = wallWidth;
 
 class Walls extends GameObject {
-  constructor(game, name) {
-    super(game, name);
+  constructor(level, name) {
+    super(level, name);
 
     const wallsGroup = new THREE.Group();
 

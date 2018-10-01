@@ -5,6 +5,7 @@ import LevelLoader from './objects/levelLoader';
 import BallCreator from './objects/ballCreator';
 import BallSetter from './objects/ballSetter';
 import Ball from './objects/ball';
+import Metrics from './Metrics';
 import { STATES } from './globals';
 
 class Level {
@@ -13,10 +14,23 @@ class Level {
     this.position = position;
     this.levelNr = levelNr;
     this.parentSimulation = simulation;
+    this.metrics = new Metrics(this);
     this.start();
+
+
+    this.metrics.onBrickDestroyed((metrics) => {
+      console.log('Brick Destroyed');
+      console.log(metrics);
+    });
+
+    this.metrics.onFinished((metrics) => {
+      console.log('Finished');
+      console.log(metrics);
+    });
   }
 
   update() {
+    this.metrics.update();
     for (let obj of this.game.objects) {
       if (obj.update && obj.loaded == true) {
         obj.update();
@@ -49,27 +63,27 @@ class Level {
   }
 
   initGame() {
-    this.game = new Game(this.parentSimulation, this.scene);
+    this.game = new Game(this);
 
-    this.walls = new Walls(this.game, 'Walls');
+    this.walls = new Walls(this, 'Walls');
     this.game.add(this.walls);
 
-    this.levelLoader = new LevelLoader(this.game, 'LevelLoader', this.levelNr);
+    this.levelLoader = new LevelLoader(this, 'LevelLoader', this.levelNr);
     this.game.add(this.levelLoader);
 
     if (this.parentSimulation.rendering) {
-      this.ballCreator = new BallCreator(this.game, 'BallCreator');
+      this.ballCreator = new BallCreator(this, 'BallCreator');
       this.ballCreator.id = 'ballCreator';
       this.game.add(this.ballCreator);
     }
 
     if (this.ballsConfiguration !== undefined) {
-      this.ballSetter = new BallSetter(this.game, 'BallSetter', this.ballsConfiguration);
+      this.ballSetter = new BallSetter(this, 'BallSetter', this.ballsConfiguration);
       this.ballSetter.id = 'ballSetter';
       this.game.add(this.ballSetter);
     }
 
-    // this.ball = new Ball(this.game);
+    // this.ball = new Ball(this);
     // this.game.add(this.ball);
   }
 

@@ -1,10 +1,5 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon';
-import ResourceLoader from '../ResourceLoader';
 import GameObject from '../generics/GameObject';
-import RigidBody from '../generics/RigidBody';
-import { timeStep } from '../globals';
-import keypressed from '../keypressed';
 import CollisionDetector from '../generics/CollisionDetector';
 import { STATES } from '../globals';
 
@@ -17,8 +12,8 @@ const BALL_SCALE = 1;
 const SPEED = 1;
 
 class Ball extends GameObject {
-  constructor(game, name, initialDirection, initialPosition, color = 0x38e1ec) {
-    super(game, name);
+  constructor(level, name, initialDirection, initialPosition, color = 0x38e1ec) {
+    super(level, name);
 
     if (initialDirection) {
       this.direction = initialDirection;
@@ -28,7 +23,7 @@ class Ball extends GameObject {
 
     //    const geometry = new THREE.CylinderGeometry(10, 10, 30);
     const geometry = new THREE.SphereGeometry(BALL_RADIUS, BALL_WIDTH_SEGMENTS, BALL_HEIGHT_SEGMENTS);
-    const material = new THREE.MeshBasicMaterial({ color: color, envMap: game.parentSimulation.scene.background });
+    const material = new THREE.MeshBasicMaterial({ color: color, envMap: this.level.parentSimulation.scene.background });
     const ball = new THREE.Mesh(geometry, material);
 
     this.arrowGrp = new THREE.Group();
@@ -78,7 +73,7 @@ class Ball extends GameObject {
   }
 
   update() {
-    if (this.game.state === STATES.RUNNING) {
+    if (this.level.game.state === STATES.RUNNING) {
       this.arrowGrp.visible = false;
 
       const nextPositionOnThisDirection = this.mesh.position.clone();
@@ -88,7 +83,7 @@ class Ball extends GameObject {
         [[new THREE.Vector3(-1, 0, 0), BALL_RADIUS],
         [new THREE.Vector3(1, 0, 0), BALL_RADIUS], 
         [new THREE.Vector3(0, -1, 0), BALL_RADIUS],
-        [new THREE.Vector3(0, 1, 0), BALL_RADIUS]], this.game.scene.getObjectsOfGroups(['ballCollisions']))
+        [new THREE.Vector3(0, 1, 0), BALL_RADIUS]], this.level.scene.getObjectsOfGroups(['ballCollisions']))
 //      console.log(collidesLeft, collidesRight, collidesDown, collidesUp);
       if (collidesLeft || collidesRight) {
         this.direction.x = -this.direction.x;
@@ -104,7 +99,7 @@ class Ball extends GameObject {
       // TODO limit colObjs to UNIQUE objects (to avoid repeating check 4 times)
       for (let colObj of colObjs) {
         if (colObj.isOfGroup('destroyable')) {
-          this.game.destroy(colObj.userData.gameObject);
+          this.level.game.destroy(colObj.userData.gameObject);
         }
       }
     } else {

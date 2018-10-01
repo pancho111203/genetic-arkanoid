@@ -8,21 +8,21 @@ import { tileHeight, tileWidth, tileDepth, nTilesH, nTilesV } from '../globals';
 import Brick from './brick';
 
 class LevelLoader extends GameObject {
-  constructor(game, name, startLevel=0) {
-    super(game, name);
+  constructor(level, name, startLevel=0) {
+    super(level, name);
 
     this.trackedBricksDestroyed = {};
-    this.level = startLevel;
-    this.loadLevel(this.level);
+    this.levelNr = startLevel;
+    this.loadLevel(this.levelNr);
     this.loaded = true;
   }
 
-  loadLevel(level) {
+  loadLevel(levelNr) {
     function genArrowFunc(this_, tId) {
       return () => { this_.setAsDestroyed(tId) }
     }
-    console.log('Loading level: ' + level);
-    const distribution = levelsJson[level];
+    console.log('Loading level: ' + levelNr);
+    const distribution = levelsJson[levelNr];
     let trackingId = 0;
     for (let x = 0; x < nTilesH; x++) {
       for (let y = 0; y < nTilesV; y++) {
@@ -34,8 +34,8 @@ class LevelLoader extends GameObject {
   
           const this_ = this;
           const startPosition = new THREE.Vector3(startX + x * tileWidth, startY - y * tileHeight, 0); // top left corner of where the brick should be painted
-          const brick = new Brick(this.game, 'Brick', startPosition, tileType, genArrowFunc(this_, trackingId));
-          this.game.add(brick);
+          const brick = new Brick(this.level, 'Brick', startPosition, tileType, genArrowFunc(this_, trackingId));
+          this.level.game.add(brick);
           this.trackedBricksDestroyed[trackingId] = false;
         }
         trackingId++;
@@ -46,8 +46,7 @@ class LevelLoader extends GameObject {
   setAsDestroyed(trackingId) {
     this.trackedBricksDestroyed[trackingId] = true;
     if(this.areAllBricksDestroyed()) {
-      console.log('All bricks destroyed');
-      // todo publish to metric
+      this.level.metrics.finished();
     }
   }
 
