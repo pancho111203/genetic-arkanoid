@@ -4,7 +4,6 @@ import Walls from './objects/walls';
 import LevelLoader from './objects/levelLoader';
 import BallCreator from './objects/ballCreator';
 import BallSetter from './objects/ballSetter';
-import Ball from './objects/ball';
 import Metrics from './Metrics';
 import { STATES } from './globals';
 
@@ -16,17 +15,6 @@ class Level {
     this.parentSimulation = simulation;
     this.metrics = new Metrics(this);
     this.start();
-
-
-    this.metrics.onBrickDestroyed((metrics) => {
-      console.log('Brick Destroyed');
-      console.log(metrics);
-    });
-
-    this.metrics.onFinished((metrics) => {
-      console.log('Finished');
-      console.log(metrics);
-    });
   }
 
   update() {

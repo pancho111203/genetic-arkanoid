@@ -1,10 +1,15 @@
 import { STATES } from './globals';
+
+const FINISH_TIMEOUT = 60000;
+
 class Metrics {
   constructor(level) {
+    this.isFinished = false;
     this.level = level;
     this.metrics = {
       updatesRunningExecuted: 0,
-      bricksDestroyed: 0
+      bricksDestroyed: 0,
+      finishedOnTimeout: false
     }
 
     this.callbacks = {
@@ -21,10 +26,11 @@ class Metrics {
     this.callbacks.onBrickDestroyed.push(cb);
   }
 
-  finished() {
+  setAsFinished() {
     for (let cb of this.callbacks.onFinished) {
-      cb(this.metrics);
+      cb(this.metrics, this.level);
     }
+    this.isFinished = true;
   }
 
   brickDestroyed() {
@@ -35,8 +41,12 @@ class Metrics {
   }
 
   update() {
-    if (this.level.game.state === STATES.RUNNING) {
+    if (this.level.game.state === STATES.RUNNING && this.isFinished === false) {
       this.metrics.updatesRunningExecuted = this.metrics.updatesRunningExecuted + 1;
+      if (this.metrics.updatesRunningExecuted >= FINISH_TIMEOUT) {
+        this.metrics.finishedOnTimeout = true;
+        this.setAsFinished();
+      }
     }
   }
 }

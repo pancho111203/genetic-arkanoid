@@ -6,19 +6,19 @@ module.exports = {
         filename: 'bundle.js'
     },
     module: {
-        rules: [{
-            test: /\.js$/,
-            exclude: /node_modules/,
-            use: 'babel-loader'
-        }],
+        rules: [
+            {
+                test: /\.worker\.js$/,
+                use: 'worker-loader'
+            }, {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: 'babel-loader'
+            }],
         loaders: [
             {
                 test: /\.json$/,
                 loader: 'json-loader'
-            },
-            {
-                test: /\.worker\.js$/,
-                use: 'worker-loader'
             }
         ]
     }

@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import ResourceLoader from '../ResourceLoader';
 import GameObject from '../generics/GameObject';
 import { tileHeight, tileWidth, tileDepth } from '../globals';
 

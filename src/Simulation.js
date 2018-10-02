@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import './extensions';
-import { timeStep, updatesPerTimestep } from './globals'
 import Camera from './objects/camera';
 import { getUrlVars } from './util';
 import Level from './Level';
@@ -8,7 +7,9 @@ import Level from './Level';
 // TODO add listeners to notify on completion
 
 class Simulation {
-  constructor(rendering, levelConfigurations) {
+  constructor(rendering, levelConfigurations, timeStep = 1 / 60.0, updatesPerTimestep = 1) {
+    this.timeStep = timeStep;
+    this.updatesPerTimestep = updatesPerTimestep;
     this.levelConfigurations = levelConfigurations;
     this.rendering = rendering;
     this.scene = new THREE.Scene();
@@ -17,17 +18,24 @@ class Simulation {
     this.lastTime = undefined;
     this.delta = 0;
 
-    const cubeTexture = new THREE.CubeTextureLoader()
-      .setPath('dist/textures/cube/skybox/')
-      .load([
-        'px.jpg',
-        'nx.jpg',
-        'py.jpg',
-        'ny.jpg',
-        'pz.jpg',
-        'nz.jpg'
-      ]);
-    this.scene.background = cubeTexture;
+    this.callbacks = {
+      onFinished: []
+    };
+
+    if (rendering) {
+      const cubeTexture = new THREE.CubeTextureLoader()
+        .setPath('dist/textures/cube/skybox/')
+        .load([
+          'px.jpg',
+          'nx.jpg',
+          'py.jpg',
+          'ny.jpg',
+          'pz.jpg',
+          'nz.jpg'
+        ]);
+      this.scene.background = cubeTexture;
+    }
+
 
     this.renderer = null;
     this.camera = null;
@@ -49,12 +57,32 @@ class Simulation {
     }
 
     this.setLevels();
-    
+
     requestAnimationFrame((time) => this.mainLoop(time));
+  }
+
+  onFinished(cb) {
+    this.callbacks.onFinished.push(cb);
+  }
+
+  trackLevelHasFinished(index) {
+    return (metrics, level) => {
+      if (this.levels[index] === level) {
+        this.finishedLevelsMetrics[index] = metrics;
+      }
+
+      // call onfinished if all levels finished
+      if (!this.finishedLevelsMetrics.some((o) => o === null)) {
+        for (let cb of this.callbacks.onFinished) {
+          cb(this.finishedLevelsMetrics);
+        }
+      }
+    }
   }
 
   setLevels() {
     this.levels = [];
+    this.finishedLevelsMetrics = [];
     for (let i = 0; i < this.levelConfigurations.length; i++) {
       const levelConfiguration = this.levelConfigurations[i];
       const levelNr = levelConfiguration['levelNr'];
@@ -62,8 +90,11 @@ class Simulation {
 
       const x = i % 5;
       const y = Math.floor(i / 5);
+      const index = this.levels.length;
       const level = new Level(this, levelNr, new THREE.Vector3(-120 * x, 150 * y, 0), balls);
+      level.metrics.onFinished(this.trackLevelHasFinished(index));
       this.levels.push(level);
+      this.finishedLevelsMetrics.push(null);
     }
   }
 
@@ -79,9 +110,9 @@ class Simulation {
     // Perform fixed timestep updates
     const dt = (time - this.lastTime) / 1000;
     this.delta += dt;
-    if (this.delta >= timeStep) {
-      this.delta -= timeStep;
-      for (let i = 0; i < updatesPerTimestep; i++) {
+    if (this.delta >= this.timeStep) {
+      this.delta -= this.timeStep;
+      for (let i = 0; i < this.updatesPerTimestep; i++) {
         if (this.camera) {
           this.camera.update();
         }

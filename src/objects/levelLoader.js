@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import ResourceLoader from '../ResourceLoader';
 import GameObject from '../generics/GameObject';
 import { STATES, debug } from '../globals';
 import * as PNGReader from 'pngjs';
@@ -21,7 +20,7 @@ class LevelLoader extends GameObject {
     function genArrowFunc(this_, tId) {
       return () => { this_.setAsDestroyed(tId) }
     }
-    console.log('Loading level: ' + levelNr);
+
     const distribution = levelsJson[levelNr];
     let trackingId = 0;
     for (let x = 0; x < nTilesH; x++) {
@@ -46,7 +45,7 @@ class LevelLoader extends GameObject {
   setAsDestroyed(trackingId) {
     this.trackedBricksDestroyed[trackingId] = true;
     if(this.areAllBricksDestroyed()) {
-      this.level.metrics.finished();
+      this.level.metrics.setAsFinished();
     }
   }
 

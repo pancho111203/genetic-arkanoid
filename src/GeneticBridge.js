@@ -1,11 +1,11 @@
-import WorkerAlg from './optimizers/genetic.worker';
+import WorkerAlg from './optimizers/genetic.worker.js';
 
 class GeneticBridge {
   constructor() {
     this.onGenerationReceivedCallbacks = [];
     this.onFinishedCallbacks = [];
     this.temp = 0;
-    this.worker = new WorkerAlg;
+    this.worker = new WorkerAlg();
     this.worker.onmessage = (e) => {
       const receivedObject = e.data;
       const type = receivedObject.type;
@@ -21,6 +21,9 @@ class GeneticBridge {
             cb(data);
           }
           break;
+        case 'log':
+          console.log('log on worker');
+          console.log(data);
       }
 
     }

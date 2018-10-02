@@ -1,3 +1,4 @@
+import './worker_fixes.js';
 import GeneticAlg from './GeneticAlg';
 
 let genetic = null;

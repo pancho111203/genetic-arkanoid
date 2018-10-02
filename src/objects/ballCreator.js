@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import ResourceLoader from '../ResourceLoader';
 import GameObject from '../generics/GameObject';
 import { STATES, debug } from '../globals';
 import Ball from './ball';
