@@ -1,5 +1,6 @@
 import './worker_fixes.js';
 import GeneticAlg from './GeneticAlg';
+import { workerLog } from './helpers';
 
 let genetic = null;
 self.onmessage = function (msg) {
@@ -23,9 +24,14 @@ self.onmessage = function (msg) {
       type: 'generation',
       data: {
         generation,
-        stats
+        stats,
+        level: genetic.level
       }
     });
   });
-  genetic.evolve();
+
+  genetic.evolve().then((res) => {
+    workerLog('Last generation:');
+    workerLog(res);
+  });
 }

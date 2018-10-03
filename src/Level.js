@@ -18,10 +18,12 @@ class Level {
   }
 
   update() {
-    this.metrics.update();
-    for (let obj of this.game.objects) {
-      if (obj.update && obj.loaded == true) {
-        obj.update();
+    if (!this.metrics.isFinished) {
+      this.metrics.update();
+      for (let obj of this.game.objects) {
+        if (obj.update && obj.loaded == true) {
+          obj.update();
+        }
       }
     }
   }
@@ -46,6 +48,7 @@ class Level {
   }
 
   start() {
+    this.metrics.resetMetrics();
     this.initScene();
     this.initGame();
   }

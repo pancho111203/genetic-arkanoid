@@ -11,17 +11,15 @@ export const wallWidth = 5;
 export const nTilesH = 11;
 export const nTilesV = 28;
 
-const ballSetter = {
-  PLANE_WIDTH: (nTilesH * tileWidth),
-  PLANE_HEIGHT: 45,
-  START_POSITION_Y: (-(nTilesV * tileHeight) / 2) + this.PLANE_HEIGHT / 2,
-}
+const PLANE_WIDTH = (nTilesH * tileWidth);
+const PLANE_HEIGHT = 45;
+const START_POSITION_Y = (-(nTilesV * tileHeight) / 2) + PLANE_HEIGHT / 2;
 
 export const BALL_LIMITS = {
-  limit_y_top: ballSetter.START_POSITION_Y + (ballSetter.PLANE_HEIGHT / 2),
-  limit_y_bot: ballSetter.START_POSITION_Y - (ballSetter.PLANE_HEIGHT / 2),
-  limit_x_left: -ballSetter.PLANE_WIDTH / 2,
-  limit_x_right: ballSetter.PLANE_WIDTH / 2,
+  limit_y_top: START_POSITION_Y + (PLANE_HEIGHT / 2),
+  limit_y_bot: START_POSITION_Y - (PLANE_HEIGHT / 2),
+  limit_x_left: -PLANE_WIDTH / 2,
+  limit_x_right: PLANE_WIDTH / 2,
 }
 
 export function validateBallConfiguration(ballPosition, ballDirection) {

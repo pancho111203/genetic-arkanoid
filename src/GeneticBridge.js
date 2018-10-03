@@ -22,10 +22,8 @@ class GeneticBridge {
           }
           break;
         case 'log':
-          console.log('log on worker');
           console.log(data);
       }
-
     }
   }
 

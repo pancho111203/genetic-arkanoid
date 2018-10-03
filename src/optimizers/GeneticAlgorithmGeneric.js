@@ -1,4 +1,5 @@
-import _ from 'ramda';
+import * as _ from 'ramda';
+import { workerLog, clone } from './helpers';
 
 class GeneticAlgorithmGeneric {
   constructor(options) {
@@ -8,7 +9,46 @@ class GeneticAlgorithmGeneric {
     this.options = options;
   }
 
-  
+  async evolveGen(genP) {
+    const fitnesses = await this.fitness(genP);
+    let gen = genP.map((config, ix) => {
+      return {
+        config: config.config,
+        fitness: fitnesses[ix].fitness,
+        otherData: fitnesses[ix].data
+      };
+    });
+
+    gen.sort((a, b) => {
+      return this.optimizeFitness(a.fitness, b.fitness) ? -1 : 1;
+    });
+
+    gen = this.replace(gen);
+    const stats = this.calculateStats(gen);
+    this.generationResult(gen, stats);
+
+    const newGenConfigs = [];
+
+    if (this.options.keepBest) {
+      newGenConfigs.push(gen[0].config);
+    }
+
+    while (newGenConfigs.length < this.options.size) {
+      const selectedPair = this.selectPair(gen);
+      const childs = this.crossover(selectedPair[0], selectedPair[1]).map((child) => {
+        return this.mutate(child);
+      });
+      newGenConfigs.push(childs[0]);
+      newGenConfigs.push(childs[1]);
+    }
+
+    return newGenConfigs.map((config) => {
+      return {
+        config
+      };
+    });
+  }
+
   async evolve() {
     let gen = [];
     for (let i = 0; i < this.options.size; i++) {
@@ -18,45 +58,10 @@ class GeneticAlgorithmGeneric {
     }
 
     for (let i = 0; i < this.options.steps && !this.shouldEnd; i++) {
-      gen = gen.map(async (individual) => {
-        const config = individual.config;
-        const fitness = await this.fitness(config);
-        return {
-          config,
-          fitness
-        }
-      })
-
-      gen.sort((a, b) => {
-        return this.optimizeFitness(a.fitness, b.fitness) ? -1 : 1;
-      });
-
-      gen = this.replace(gen);
-      const stats = this.calculateStats(gen);
-      this.generationResult(gen, stats);
-
-      const newGenConfigs = [];
-
-      if (this.options.keepBest) {
-        newGenConfigs.push(gen[0].config);
-      }
-
-      while (newGenConfigs.length < this.options.size) {
-        const selectedPair = this.selectPair(gen);
-        const childs = this.crossover(selectedPair[0], selectedPair[1]).map((child) => {
-          return this.mutate(child);
-        });
-        newGenConfigs.push(childs[0]);
-        newGenConfigs.push(childs[1]);
-      }
-
-      gen = newGenConfigs.map((config) => {
-        return {
-          config
-        };
-      })
+      gen = await this.evolveGen(gen);
     }
     this.sendFinished();
+    return gen;
   }
 
   terminate() {
@@ -115,7 +120,9 @@ class GeneticAlgorithmGeneric {
     throw new Error('This function needs to be implemented on the child class');
   }
 
-  fitness(config) {
+  fitness(gen) {
+    // fitness of whole generation
+    // must return array of objects [{ fitness: 34, data: {}}]
     throw new Error('This function needs to be implemented on the child class');
   }
 

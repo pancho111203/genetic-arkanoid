@@ -2,16 +2,17 @@ import * as _ from 'ramda';
 import GeneticAlgorithmGeneric from './GeneticAlgorithmGeneric';
 import Simulation from '../Simulation';
 import { BALL_LIMITS } from '../globals';
-import { getRandom, getRandomInt } from './helpers';
+import { getRandom, getRandomInt, workerLog } from './helpers';
 //const DEFAULT_BALL = [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]];
 
 const DEFAULT_OPTIONS = {
   size: 10,
-  steps: 10,
+  steps: 100,
   keepBest: true,
-  timestep: 1/60,
+  timestep: 1 / 60,
   updatesPerTimestep: 300,
-  maxBalls: 10
+  maxBalls: 10,
+  fixedNumberOfBalls: false
 }
 
 class GeneticAlg extends GeneticAlgorithmGeneric {
@@ -36,52 +37,79 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
     return config;
   }
 
+  removeRandomBallFromConfig(config) {
+    const ind = getRandomInt(0, config.length);
+    return _.remove(ind, 1, config);
+  }
+
+  addRandomBallToConfig(config) {
+    const ball = this.createRandomBall();
+    return _.append(ball, config);
+  }
+
   mutate(config) {
+    if (getRandom(0, 1) > 0.5) {
+      config = this.removeRandomBallFromConfig(config);
+    }
+    if (getRandom(0, 1) > 0.5) {
+      config = this.addRandomBallToConfig(config);
+    }
+
     return config;
-    // const mutationIndex = getRandomInt(0, MIN_MAX_CONFIGS.length);
-    // return _.adjust((el) => { return getRandom(MIN_MAX_CONFIGS[mutationIndex][0], MIN_MAX_CONFIGS[mutationIndex][1]); }, mutationIndex, config);
   }
 
   crossover(mother, father) {
-    return [mother, father];
-    // const son = [];
-    // const daughter = [];
-    // for (let i = 0; i < MIN_MAX_CONFIGS.length; i++) {
-    //   const selector = getRandomInt(0, 2);
-    //   if (selector === 0) {
-    //     son.push(mother[i]);
-    //     daughter.push(father[i]);
-    //   } else {
-    //     son.push(father[i]);
-    //     daughter.push(mother[i]);
-    //   }
-    // }
-    // return [son, daughter];
+    const son = [];
+    const daughter = [];
+    for (let ball of _.concat(mother, father)) {
+      if (getRandom(0, 1) > 0.5) {
+        son.push(ball);
+      } else {
+        daughter.push(ball);
+      }
+    }
+    return [son, daughter];
   }
 
-  fitness(config) {
+  fitness(gen) {
     return new Promise((resolve, reject) => {
-      const simulation = new Simulation(false, config, this.options.timestep, this.options.updatesPerTimestep);
+      const levelConfigs = gen.map((ind) => {
+        return {
+          levelNr: this.level,
+          balls: ind.config
+        };
+      });
+      const simulation = new Simulation(false, levelConfigs, this.options.timestep, this.options.updatesPerTimestep);
+      workerLog('STARTED SIMULATION with levelConfigs:');
+      workerLog(levelConfigs);
+      const timeStart = Date.now();
       simulation.onFinished((results) => {
-        if (results.length !== config.length) {
+        const timeEnd = Date.now();
+        const timeTaken = timeEnd - timeStart;
+        workerLog(`FINISHED SIMULATION after ${timeTaken/1000} seconds`);
+        if (results.length !== gen.length) {
           reject('Invalid number of results returned');
         }
-        const fitnesses = [];
-        for (let i = 0; i < config.length; i++) {
-          const nrBalls = config[i].length;
+        const res = [];
+        for (let i = 0; i < gen.length; i++) {
+          const nrBalls = gen[i].config.length;
           const updatesRunningExecuted = results[i].updatesRunningExecuted;
           const finishedOnTimeout = results[i].finishedOnTimeout;
-
+          let fitness;
           if (finishedOnTimeout) {
             fitness = 99999999999;
           } else {
             // TODO think of best fitness functions
-            fitness = nrBalls * nrBalls * updatesRunningExecuted;
+            fitness = nrBalls * updatesRunningExecuted;
           }
-          fitnesses.push(fitness);
+          res.push({
+            fitness,
+            data: _.merge({ nrBalls }, results[i])
+          });
         }
-        resolve(fitnesses);
+        resolve(res);
       });
+      simulation.run();
     });
   }
 

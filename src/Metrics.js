@@ -1,6 +1,6 @@
 import { STATES } from './globals';
 
-const FINISH_TIMEOUT = 60000;
+const FINISH_TIMEOUT = 20000;
 
 class Metrics {
   constructor(level) {
@@ -24,6 +24,15 @@ class Metrics {
 
   onBrickDestroyed(cb) {
     this.callbacks.onBrickDestroyed.push(cb);
+  }
+
+  resetMetrics() {
+    this.metrics.isFinished = false;
+    this.metrics = {
+      updatesRunningExecuted: 0,
+      bricksDestroyed: 0,
+      finishedOnTimeout: false
+    }
   }
 
   setAsFinished() {
