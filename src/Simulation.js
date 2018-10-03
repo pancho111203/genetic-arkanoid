@@ -48,7 +48,7 @@ class Simulation {
       this.renderer.setSize(window.innerWidth - 4, window.innerHeight - 4);
       document.body.appendChild(this.renderer.domElement);
 
-      this.camera = new Camera();
+      this.camera = new Camera(this.renderer);
 
       window.addEventListener('resize', () => {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -118,14 +118,7 @@ class Simulation {
     this.delta += dt;
     if (this.delta >= this.timeStep) {
       this.delta -= this.timeStep;
-      for (let i = 0; i < this.updatesPerTimestep; i++) {
-        if (this.camera) {
-          this.camera.update();
-        }
-        for (let level of this.levels) {
-          level.update();
-        }
-      }
+      this.update();
     }
 
     if (this.rendering) {
@@ -139,6 +132,17 @@ class Simulation {
 
   isRendering() {
     return this.rendering;
+  }
+
+  update() {
+    for (let i = 0; i < this.updatesPerTimestep; i++) {
+      if (this.camera) {
+        this.camera.update();
+      }
+      for (let level of this.levels) {
+        level.update();
+      }
+    }
   }
 
   run() {

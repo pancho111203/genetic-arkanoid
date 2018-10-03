@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three-full';
 
 class Camera {
-  constructor() {
+  constructor(renderer) {
     if (!window || !process.browser) {
       throw new Error('Cant create a camera if not in a browser environment (without rendering)');
     }
@@ -18,7 +18,7 @@ class Camera {
 
     this.camera.name = 'MainCamera';
 
-    const orbitControls = new OrbitControls(this.camera);
+    const orbitControls = new OrbitControls(this.camera, renderer.domElement);
   }
 
   pointIsOnCamera(point) {

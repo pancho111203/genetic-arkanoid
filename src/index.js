@@ -1,10 +1,12 @@
+import * as dat from 'dat.gui';
 import Simulation from './Simulation';
-import { getUrlVars } from './util';
+import { getUrlVars, downloadObjectAsJson } from './util';
 import GeneticBridge from './GeneticBridge';
 
 
 const levelNr = getUrlVars()['level'] || 0;
 const trackedConfigurations = [];
+
 
 const demoConfig = [{
     levelNr: 20,
@@ -46,6 +48,23 @@ function addTrackedConfigButton(index, isNewBest) {
     trackedConfigButtonsElement.appendChild(button);
 }
 
+const geneticOptions = {
+    size: 10,
+    steps: 100,
+    keepBest: true,
+    timestep: 1 / 60,
+    updatesPerTimestep: 300,
+    maxBalls: 10,
+    fixedNumberOfBalls: false,
+    mutationFunction: 0,
+    crossoverFunction: 0,
+    fitnessFunction: 0
+};
+
+const history = {};
+history['options'] = geneticOptions;
+history['generations'] = [];
+
 let bestFitness = 999999;
 const geneticBridge = new GeneticBridge();
 geneticBridge.onGenerationReceived((data) => {
@@ -69,8 +88,49 @@ geneticBridge.onGenerationReceived((data) => {
         console.log(levelConfigs);
         console.log('Stats:');
         console.log(data.stats);
+
+        history['generations'].push(data);
         trackedConfigurations.push(levelConfigs);
         addTrackedConfigButton(trackedConfigurations.length - 1, isNewBest);
     }
 });
-geneticBridge.startOptimizer(levelNr);
+geneticBridge.startOptimizer(levelNr, geneticOptions);
+
+
+const gui = new dat.GUI();
+const downloadFolder = gui.addFolder('Download');
+const controls = {
+    historyFilename: 'unnamed.metrics',
+    download: () => {
+        downloadObjectAsJson(history, controls.historyFilename);
+    }
+};
+downloadFolder.add(controls, 'historyFilename');
+downloadFolder.add(controls, 'download');
+// const controls = {
+//     giroBase: -113,
+//     giroBrazo: -38,
+//     giroAntebrazoY: 42,
+//     giroAntebrazoZ: -60,
+//     giroPinza: 29,
+//     separacionPinza: 15
+// };
+
+// controlFolder.add(controls, 'giroBase', -180, 180).onChange(() => {
+//     console.log(controls.giroBase);
+// });
+// controlFolder.add(controls, 'giroBrazo', -45, 45).onChange(() => {
+//     console.log(controls.giroBrazo);
+// });
+// controlFolder.add(controls, 'giroAntebrazoY', -180, 180).onChange(() => {
+//     console.log(controls.giroAntebrazoY);
+// });
+// controlFolder.add(controls, 'giroAntebrazoZ', -90, 90).onChange(() => {
+//     console.log(controls.giroAntebrazoZ);
+// });
+// controlFolder.add(controls, 'giroPinza', -40, 220).onChange(() => {
+//     console.log(controls.giroPinza);
+// });
+// controlFolder.add(controls, 'separacionPinza', 0, 15).onChange(() => {
+//     console.log(controls.separacionPinza);
+// });

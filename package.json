@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "cannon": "^0.6.2",
+    "dat.gui": "^0.7.2",
     "json-loader": "^0.5.7",
     "pngjs": "^3.3.3",
     "ramda": "^0.25.0",

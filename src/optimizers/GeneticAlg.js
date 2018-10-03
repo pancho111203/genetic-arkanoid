@@ -5,19 +5,50 @@ import { BALL_LIMITS } from '../globals';
 import { getRandom, getRandomInt, workerLog } from './helpers';
 //const DEFAULT_BALL = [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]];
 
-const DEFAULT_OPTIONS = {
-  size: 10,
-  steps: 100,
-  keepBest: true,
-  timestep: 1 / 60,
-  updatesPerTimestep: 300,
-  maxBalls: 10,
-  fixedNumberOfBalls: false
-}
-
 class GeneticAlg extends GeneticAlgorithmGeneric {
-  constructor(level, options = DEFAULT_OPTIONS) {
+  constructor(level, options) {
     super(options);
+
+    this.mutationFunctions = {
+      0: (config) => {
+        if (getRandom(0, 1) > 0.5) {
+          config = this.removeRandomBallFromConfig(config);
+        }
+        if (getRandom(0, 1) > 0.5) {
+          config = this.addRandomBallToConfig(config);
+        }
+
+        return config;
+      }
+    };
+
+    this.crossoverFunctions = {
+      0: (mother, father) => {
+        const son = [];
+        const daughter = [];
+        for (let ball of _.concat(mother, father)) {
+          if (getRandom(0, 1) > 0.5) {
+            son.push(ball);
+          } else {
+            daughter.push(ball);
+          }
+        }
+        return [son, daughter];
+      }
+    };
+
+    this.fitnessFunctions = {
+      0: (simulationResult, config) => {
+        const nrBalls = config.length;
+        const updatesRunningExecuted = simulationResult.updatesRunningExecuted;
+        const finishedOnTimeout = simulationResult.finishedOnTimeout;
+        if (finishedOnTimeout) {
+          return 99999999999;
+        } else {
+          return nrBalls * updatesRunningExecuted;
+        }
+      }
+    };
 
     this.level = level;
   }
@@ -48,27 +79,11 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
   }
 
   mutate(config) {
-    if (getRandom(0, 1) > 0.5) {
-      config = this.removeRandomBallFromConfig(config);
-    }
-    if (getRandom(0, 1) > 0.5) {
-      config = this.addRandomBallToConfig(config);
-    }
-
-    return config;
+    return this.mutationFunctions[this.options.mutationFunction](config);
   }
 
   crossover(mother, father) {
-    const son = [];
-    const daughter = [];
-    for (let ball of _.concat(mother, father)) {
-      if (getRandom(0, 1) > 0.5) {
-        son.push(ball);
-      } else {
-        daughter.push(ball);
-      }
-    }
-    return [son, daughter];
+    return this.crossoverFunctions[this.options.crossoverFunction](mother, father);
   }
 
   fitness(gen) {
@@ -90,19 +105,14 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
         }
         const res = [];
         for (let i = 0; i < gen.length; i++) {
-          const nrBalls = gen[i].config.length;
-          const updatesRunningExecuted = results[i].updatesRunningExecuted;
-          const finishedOnTimeout = results[i].finishedOnTimeout;
-          let fitness;
-          if (finishedOnTimeout) {
-            fitness = 99999999999;
-          } else {
-            // TODO think of best fitness functions
-            fitness = nrBalls * updatesRunningExecuted;
-          }
+          const config = gen[i].config;
+          const simulationResult = results[i];
+
+          const fitness = this.fitnessFunctions[this.options.fitnessFunction](simulationResult, config);
+
           res.push({
             fitness,
-            data: _.merge({ nrBalls }, results[i])
+            data: _.merge({ nrBalls: config.length }, simulationResult)
           });
         }
         resolve(res);
