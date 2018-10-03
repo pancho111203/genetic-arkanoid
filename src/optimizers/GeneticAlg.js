@@ -82,11 +82,9 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
       const simulation = new Simulation(false, levelConfigs, this.options.timestep, this.options.updatesPerTimestep);
       workerLog('STARTED SIMULATION with levelConfigs:');
       workerLog(levelConfigs);
-      const timeStart = Date.now();
-      simulation.onFinished((results) => {
-        const timeEnd = Date.now();
-        const timeTaken = timeEnd - timeStart;
-        workerLog(`FINISHED SIMULATION after ${timeTaken/1000} seconds`);
+      simulation.onFinished((data) => {
+        const results = data.metrics;
+        workerLog(`FINISHED SIMULATION after ${data.secondsTaken} seconds`);
         if (results.length !== gen.length) {
           reject('Invalid number of results returned');
         }

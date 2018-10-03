@@ -10,7 +10,6 @@ import Level from './Level';
 class Simulation {
   constructor(rendering, levelConfigurations, timeStep = 1 / 60.0, updatesPerTimestep = 1) {
     this.timeStep = timeStep;
-    this.finished = false;
     this.updatesPerTimestep = updatesPerTimestep;
     this.levelConfigurations = levelConfigurations;
     this.rendering = rendering;
@@ -60,8 +59,7 @@ class Simulation {
 
     this.setLevels();
 
-    //    requestAnimationFrame((time) => this.mainLoop(time));
-    this.mainLoop2();
+    requestAnimationFrame((time) => this.mainLoop(time));
   }
 
   onFinished(cb) {
@@ -78,8 +76,11 @@ class Simulation {
       if (!this.finishedLevelsMetrics.some((o) => o === null)) {
         for (let cb of this.callbacks.onFinished) {
           const timeTaken = (Date.now() - this.startTime) / 1000;
-          this.finished = true;
-          cb(_.merge(this.finishedLevelsMetrics, { secondsTaken: timeTaken }));
+          const res = {
+            metrics: this.finishedLevelsMetrics,
+            secondsTaken: timeTaken
+          };
+          cb(res);
         }
       }
     }
@@ -100,21 +101,6 @@ class Simulation {
       level.metrics.onFinished(this.trackLevelHasFinished(index));
       this.levels.push(level);
       this.finishedLevelsMetrics.push(null);
-    }
-  }
-
-  mainLoop2() {
-    const update = () => {
-      if (this.camera) {
-        this.camera.update();
-      }
-      for (let level of this.levels) {
-        level.update();
-      }
-    }
-
-    while (!this.finished) {
-      update();
     }
   }
 
