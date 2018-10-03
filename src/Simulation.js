@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as _ from 'ramda';
 import './extensions';
 import Camera from './objects/camera';
 import { getUrlVars } from './util';
@@ -9,6 +10,7 @@ import Level from './Level';
 class Simulation {
   constructor(rendering, levelConfigurations, timeStep = 1 / 60.0, updatesPerTimestep = 1) {
     this.timeStep = timeStep;
+    this.finished = false;
     this.updatesPerTimestep = updatesPerTimestep;
     this.levelConfigurations = levelConfigurations;
     this.rendering = rendering;
@@ -58,7 +60,8 @@ class Simulation {
 
     this.setLevels();
 
-    requestAnimationFrame((time) => this.mainLoop(time));
+    //    requestAnimationFrame((time) => this.mainLoop(time));
+    this.mainLoop2();
   }
 
   onFinished(cb) {
@@ -74,7 +77,9 @@ class Simulation {
       // call onfinished if all levels finished
       if (!this.finishedLevelsMetrics.some((o) => o === null)) {
         for (let cb of this.callbacks.onFinished) {
-          cb(this.finishedLevelsMetrics);
+          const timeTaken = (Date.now() - this.startTime) / 1000;
+          this.finished = true;
+          cb(_.merge(this.finishedLevelsMetrics, { secondsTaken: timeTaken }));
         }
       }
     }
@@ -95,6 +100,21 @@ class Simulation {
       level.metrics.onFinished(this.trackLevelHasFinished(index));
       this.levels.push(level);
       this.finishedLevelsMetrics.push(null);
+    }
+  }
+
+  mainLoop2() {
+    const update = () => {
+      if (this.camera) {
+        this.camera.update();
+      }
+      for (let level of this.levels) {
+        level.update();
+      }
+    }
+
+    while (!this.finished) {
+      update();
     }
   }
 
@@ -136,6 +156,7 @@ class Simulation {
   }
 
   run() {
+    this.startTime = Date.now();
     for (let lvl of this.levels) {
       lvl.run();
     }
