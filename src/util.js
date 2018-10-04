@@ -27,3 +27,25 @@ export function runsOnWorker() {
     return false;
   }
 }
+
+export function loadFileAsJson(cb) {
+  const input = document.getElementById('fileInput')
+  input.addEventListener('change', function () {
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (function (theFile) {
+      return function (e) {
+        try {
+          const json = JSON.parse(e.target.result);
+          cb(json);
+        } catch (ex) {
+          throw new Error('ex when trying to parse json = ' + ex);
+        }
+      }
+    })(file);
+    reader.readAsText(file);
+  });
+
+  input.click();
+}

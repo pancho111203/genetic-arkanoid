@@ -3,6 +3,7 @@ import { BALL_LIMITS } from '../globals';
 import { getRandom, getRandomInt, workerLog, clone } from './helpers';
 
 // this.options = {
+//   level: 0,
 //   initialTemperature: 100,
 //   maxIterations: 100000,
 //   coolingFactor: 0.9,

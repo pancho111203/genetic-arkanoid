@@ -24,7 +24,7 @@ self.onmessage = function (msg) {
     postMessage({
       type: 'generation',
       data: {
-        individual,
+        generation: [individual],
         stats,
         level: level
       }
