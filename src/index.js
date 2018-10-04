@@ -7,7 +7,7 @@ import GeneticBridge from './GeneticBridge';
 const levelNr = getUrlVars()['level'] || 0;
 let history = {};
 const demoConfig = [{
-    levelNr: 20,
+    levelNr: levelNr,
     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
 }];
 
@@ -120,6 +120,7 @@ downloadFolder.add(controls, 'download').name('Download');
 downloadFolder.add(controls, 'loadHistory').name('Load');
 
 const geneticOptions = {
+    level: 0,
     size: 10,
     steps: 100,
     keepBest: true,
@@ -140,10 +141,11 @@ const geneticControls = {
         console.log(geneticOptions);
         console.log('Alert: changing the options from this point on will have no effect');
         history['options'] = geneticOptions;
-        geneticBridge.startOptimizer(levelNr, geneticOptions);
+        geneticBridge.startOptimizer(geneticOptions.level, geneticOptions);
     }
 };
 geneticFolder.add(geneticControls, 'evolve').name('Start Evolution');
+geneticFolder.add(geneticOptions, 'level');
 geneticFolder.add(geneticOptions, 'size');
 geneticFolder.add(geneticOptions, 'steps');
 geneticFolder.add(geneticOptions, 'keepBest');

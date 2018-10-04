@@ -18,6 +18,11 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
         }
 
         return config;
+      },
+      1: (config) => {
+        config = this.removeRandomBallFromConfig(config);
+        config = this.addRandomBallToConfig(config);
+        return config;
       }
     };
 
@@ -31,6 +36,24 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
           } else {
             daughter.push(ball);
           }
+        }
+        return [son, daughter];
+      },
+      1: (mother, father) => {
+        const son = [];
+        const daughter = [];
+        let parents = _.concat(mother, father);
+        for (let i = 0; i < this.options.maxBalls; i++) {
+          const index = getRandomInt(0, parents.length);
+          const ball = parents[index];
+          parents = _.remove(index, 1, parents);
+          son.push(ball);
+        }
+        for (let i = 0; i < this.options.maxBalls; i++) {
+          const index = getRandomInt(0, parents.length);
+          const ball = parents[index];
+          parents = _.remove(index, 1, parents);
+          daughter.push(ball);
         }
         return [son, daughter];
       }
@@ -78,7 +101,13 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
 
   seed() {
     const config = [];
-    const num_balls = getRandomInt(1, this.options.maxBalls + 1);
+    let num_balls;
+    if (this.options.fixedNumberOfBalls) {
+      num_balls = this.options.maxBalls;
+    } else {
+      num_balls = getRandomInt(1, this.options.maxBalls + 1);
+    }
+    
     for (let i = 0; i < num_balls; i++) {
       config.push(this.createRandomBall());
     }
