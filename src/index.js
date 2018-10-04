@@ -53,7 +53,7 @@ const geneticOptions = {
     steps: 100,
     keepBest: true,
     timestep: 1 / 60,
-    updatesPerTimestep: 300,
+    updatesPerTimestep: 500,
     maxBalls: 10,
     fixedNumberOfBalls: false,
     mutationFunction: 0,

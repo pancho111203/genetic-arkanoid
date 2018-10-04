@@ -4,12 +4,14 @@ import './extensions';
 import Camera from './objects/camera';
 import { getUrlVars } from './util';
 import Level from './Level';
+import { runsOnWorker } from './util';
 
 // TODO add listeners to notify on completion
 
 class Simulation {
   constructor(rendering, levelConfigurations, timeStep = 1 / 60.0, updatesPerTimestep = 1) {
     this.timeStep = timeStep;
+    this.terminated = false;
     this.updatesPerTimestep = updatesPerTimestep;
     this.levelConfigurations = levelConfigurations;
     this.rendering = rendering;
@@ -107,6 +109,9 @@ class Simulation {
   // TODO fix gameloop to make update at fixed timestep - https://isaacsukin.com/news/2015/01/detailed-explanation-javascript-game-loops-and-timing
   // TODO implement way of making update much quicker for genetic simulations
   mainLoop(time) {
+    if (this.terminated) {
+      return;
+    }
     if (this.lastTime == undefined) {
       this.lastTime = time;
     }
@@ -128,6 +133,10 @@ class Simulation {
     }
 
     this.lastTime = time;
+  }
+
+  terminate() {
+    this.terminated = true;
   }
 
   isRendering() {

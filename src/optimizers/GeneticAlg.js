@@ -98,6 +98,7 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
       workerLog('STARTED SIMULATION with levelConfigs:');
       workerLog(levelConfigs);
       simulation.onFinished((data) => {
+        simulation.terminate();
         const results = data.metrics;
         workerLog(`FINISHED SIMULATION after ${data.secondsTaken} seconds`);
         if (results.length !== gen.length) {
