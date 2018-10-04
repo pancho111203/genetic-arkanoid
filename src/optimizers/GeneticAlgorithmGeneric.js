@@ -108,7 +108,7 @@ class GeneticAlgorithmGeneric {
 
   sendFinished() {
     this.generationCallbacks.forEach((cb) => {
-      cb(null, null, null, true);
+      cb(null, null, true);
     });
   }
 
