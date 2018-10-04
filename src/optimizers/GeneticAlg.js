@@ -5,6 +5,22 @@ import { BALL_LIMITS } from '../globals';
 import { getRandom, getRandomInt, workerLog } from './helpers';
 //const DEFAULT_BALL = [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]];
 
+
+// const geneticOptions = {
+//   level: 0,
+//   size: 10,
+//   steps: 100,
+//   keepBest: true,
+//   timestep: 1 / 60,
+//   updatesPerTimestep: 500,
+//   maxBalls: 10,
+//   fixedNumberOfBalls: false,
+//   mutationFunction: 0,
+//   crossoverFunction: 0,
+//   fitnessFunction: 0,
+//   selectionOverTwo: true
+// };
+
 class GeneticAlg extends GeneticAlgorithmGeneric {
   constructor(level, options) {
     super(options);
@@ -20,6 +36,7 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
         return config;
       },
       1: (config) => {
+        // Mutacion usada cuando fixedNumberOfBalls es true (no cambia el num de bolas)
         config = this.removeRandomBallFromConfig(config);
         config = this.addRandomBallToConfig(config);
         return config;
@@ -40,6 +57,7 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
         return [son, daughter];
       },
       1: (mother, father) => {
+        // Mutacion usada cuando fixedNumberOfBalls es true (no cambia el num de bolas)
         const son = [];
         const daughter = [];
         let parents = _.concat(mother, father);
