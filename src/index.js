@@ -131,6 +131,7 @@ const geneticOptions = {
     mutationFunction: 0,
     crossoverFunction: 0,
     fitnessFunction: 0,
+    replaceFunction: 0,
     selectionOverTwo: true
 };
 
@@ -156,6 +157,7 @@ geneticFolder.add(geneticOptions, 'fixedNumberOfBalls');
 geneticFolder.add(geneticOptions, 'mutationFunction');
 geneticFolder.add(geneticOptions, 'crossoverFunction');
 geneticFolder.add(geneticOptions, 'fitnessFunction');
+geneticFolder.add(geneticOptions, 'replaceFunction');
 geneticFolder.add(geneticOptions, 'selectionOverTwo');
 
 const simulationFolder = gui.addFolder('Simulation');

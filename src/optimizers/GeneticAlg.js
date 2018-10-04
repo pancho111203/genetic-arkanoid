@@ -2,7 +2,7 @@ import * as _ from 'ramda';
 import GeneticAlgorithmGeneric from './GeneticAlgorithmGeneric';
 import Simulation from '../Simulation';
 import { BALL_LIMITS } from '../globals';
-import { getRandom, getRandomInt, workerLog } from './helpers';
+import { getRandom, getRandomInt, workerLog, clone } from './helpers';
 //const DEFAULT_BALL = [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]];
 
 
@@ -24,6 +24,22 @@ import { getRandom, getRandomInt, workerLog } from './helpers';
 class GeneticAlg extends GeneticAlgorithmGeneric {
   constructor(level, options) {
     super(options);
+
+    this.replaceFunctions = {
+      0: (configs) => {
+        return configs;
+      },
+      1: (configs) => {
+        // in this one we add extra random configs to allow some variability (alert: added ones exceed size)
+        const newConfigs = clone(configs);
+        const randomlyAdded = 2;
+        for (let i = 0; i < randomlyAdded; i++) {
+          newConfigs.push(this.seed());
+        }
+        return newConfigs;
+      }
+    }
+
     this.mutationFunctions = {
       0: (config) => {
         if (getRandom(0, 1) > 0.5) {
@@ -183,8 +199,11 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
     });
   }
 
-  replace(sortedGen) {
-    return _.take(this.options.size, sortedGen);
+  replace(configs) {
+    if (this.options.replaceFunction === undefined) {
+      return this.replaceFunctions[0](configs);
+    }
+    return this.replaceFunctions[this.options.replaceFunction](configs);
   }
 
   optimizeFitness(a, b) {

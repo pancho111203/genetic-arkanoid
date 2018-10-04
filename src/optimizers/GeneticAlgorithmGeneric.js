@@ -23,11 +23,12 @@ class GeneticAlgorithmGeneric {
       return this.optimizeFitness(a.fitness, b.fitness) ? -1 : 1;
     });
 
-    gen = this.replace(gen);
+    gen = _.take(this.options.size, gen);
+
     const stats = this.calculateStats(gen);
     this.generationResult(gen, stats);
 
-    const newGenConfigs = [];
+    let newGenConfigs = [];
 
     if (this.options.keepBest) {
       newGenConfigs.push(gen[0].config);
@@ -42,7 +43,7 @@ class GeneticAlgorithmGeneric {
       newGenConfigs.push(childs[1]);
     }
 
-    return newGenConfigs.map((config) => {
+    return this.replace(newGenConfigs).map((config) => {
       return {
         config
       };
