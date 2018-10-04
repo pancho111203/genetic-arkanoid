@@ -24,6 +24,9 @@ class BallCreator extends GameObject {
     this.currentPlacingBall = null;
 
     this.clickEvent = window.addEventListener('click', (event) => {
+      if (!this.level || !this.level.game) {
+        return;
+      }
       const mouse = new THREE.Vector2(0, 0);
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
@@ -79,10 +82,10 @@ class BallCreator extends GameObject {
   }
 
   destroy() {
+    window.removeEventListener('click', this.clickEvent);
     if (this.mesh) {
       this.level.scene.remove(this.mesh);
     }
-    window.removeEventListener('click', this.clickEvent);
   }
 }
 

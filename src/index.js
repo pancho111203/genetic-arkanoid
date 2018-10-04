@@ -5,9 +5,7 @@ import GeneticBridge from './GeneticBridge';
 
 
 const levelNr = getUrlVars()['level'] || 0;
-const trackedConfigurations = [];
-
-
+let history = {};
 const demoConfig = [{
     levelNr: 20,
     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
@@ -15,24 +13,19 @@ const demoConfig = [{
 
 const renderedSimulation = new Simulation(true, demoConfig);
 
-window.run = () => {
-    renderedSimulation.run();
-}
-
-window.pause = () => {
-    renderedSimulation.pause();
-}
-
-window.reset = () => {
-    renderedSimulation.reset();
-}
-
 function renderTrackedConfig(index) {
-    const config = trackedConfigurations[index];
+    const generation = history['generations'][index];
+    const config = generation.generation.map((ind) => {
+        return {
+            levelNr: generation.level,
+            balls: ind.config
+        };
+    });
+    console.log(generation);
     renderedSimulation.changeLevels(config);
 }
 
-function addTrackedConfigButton(index, isNewBest) {
+function addHistoryButton(index, isNewBest) {
     const trackedConfigButtonsElement = document.getElementById('trackedConfigButtons');
     const button = document.createElement('button');
     if (isNewBest) {
@@ -48,21 +41,26 @@ function addTrackedConfigButton(index, isNewBest) {
     trackedConfigButtonsElement.appendChild(button);
 }
 
-const geneticOptions = {
-    size: 10,
-    steps: 100,
-    keepBest: true,
-    timestep: 1 / 60,
-    updatesPerTimestep: 500,
-    maxBalls: 10,
-    fixedNumberOfBalls: false,
-    mutationFunction: 0,
-    crossoverFunction: 0,
-    fitnessFunction: 0
-};
+function reloadHistoryButtons() {
+    // Remove all previous elements first
+    const trackedConfigButtonsElement = document.getElementById('trackedConfigButtons');
+    while (trackedConfigButtonsElement.firstChild) {
+        trackedConfigButtonsElement.removeChild(trackedConfigButtonsElement.firstChild);
+    }
+    let bestFitness = 9999999;
+    const generations = history['generations'];
+    for (let i = 0; i < generations.length; i++) {
+        const gen = generations[i];
+        const bestCurFitness = gen.generation[0].fitness;
+        let isNewBest = false;
+        if (bestCurFitness < bestFitness) {
+            isNewBest = true;
+            bestFitness = bestCurFitness;
+        }
+        addHistoryButton(i, isNewBest);
+    }
+}
 
-const history = {};
-history['options'] = geneticOptions;
 history['generations'] = [];
 
 let bestFitness = 999999;
@@ -76,25 +74,11 @@ geneticBridge.onGenerationReceived((data) => {
             bestFitness = currentBestFitness;
             isNewBest = true;
         }
-        console.log('Generation received:');
-        console.log(data.generation);
-        console.log('LevelsConfig:');
-        const levelConfigs = data.generation.map((ind) => {
-            return {
-                levelNr: data.level,
-                balls: ind.config
-            };
-        });
-        console.log(levelConfigs);
-        console.log('Stats:');
-        console.log(data.stats);
 
         history['generations'].push(data);
-        trackedConfigurations.push(levelConfigs);
-        addTrackedConfigButton(trackedConfigurations.length - 1, isNewBest);
+        addHistoryButton(history['generations'].length - 1, isNewBest);
     }
 });
-geneticBridge.startOptimizer(levelNr, geneticOptions);
 
 
 const gui = new dat.GUI();
@@ -103,10 +87,91 @@ const controls = {
     historyFilename: 'unnamed.metrics',
     download: () => {
         downloadObjectAsJson(history, controls.historyFilename);
+    },
+    loadHistory: function () {
+        const input = document.getElementById('fileInput')
+
+        input.addEventListener('change', function () {
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (function (theFile) {
+                return function (e) {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        history = json;
+                        reloadHistoryButtons();
+                        const lastGen = history['generations'][history['generations'].length - 1].generation;
+                        geneticBridge.startOptimizer(parseInt(history['generations'][0].level), history['options'], lastGen);
+                        bestFitness = lastGen[0].fitness;
+                    } catch (ex) {
+                        throw new Error('ex when trying to parse json = ' + ex);
+                    }
+                }
+            })(file);
+            reader.readAsText(file);
+        });
+
+        input.click();
     }
 };
-downloadFolder.add(controls, 'historyFilename');
-downloadFolder.add(controls, 'download');
+downloadFolder.add(controls, 'historyFilename').name('Download File Name');
+downloadFolder.add(controls, 'download').name('Download');
+downloadFolder.add(controls, 'loadHistory').name('Load');
+
+const geneticOptions = {
+    size: 10,
+    steps: 100,
+    keepBest: true,
+    timestep: 1 / 60,
+    updatesPerTimestep: 500,
+    maxBalls: 10,
+    fixedNumberOfBalls: false,
+    mutationFunction: 0,
+    crossoverFunction: 0,
+    fitnessFunction: 0,
+    selectionOverTwo: true
+};
+
+const geneticFolder = gui.addFolder('Genetic');
+const geneticControls = {
+    evolve: () => {
+        console.log('Starting evolution with options:');
+        console.log(geneticOptions);
+        console.log('Alert: changing the options from this point on will have no effect');
+        history['options'] = geneticOptions;
+        geneticBridge.startOptimizer(levelNr, geneticOptions);
+    }
+};
+geneticFolder.add(geneticControls, 'evolve').name('Start Evolution');
+geneticFolder.add(geneticOptions, 'size');
+geneticFolder.add(geneticOptions, 'steps');
+geneticFolder.add(geneticOptions, 'keepBest');
+geneticFolder.add(geneticOptions, 'timestep');
+geneticFolder.add(geneticOptions, 'updatesPerTimestep');
+geneticFolder.add(geneticOptions, 'maxBalls');
+geneticFolder.add(geneticOptions, 'fixedNumberOfBalls');
+geneticFolder.add(geneticOptions, 'mutationFunction');
+geneticFolder.add(geneticOptions, 'crossoverFunction');
+geneticFolder.add(geneticOptions, 'fitnessFunction');
+geneticFolder.add(geneticOptions, 'selectionOverTwo');
+
+const simulationFolder = gui.addFolder('Simulation');
+const simulationControls = {
+    run: () => {
+        renderedSimulation.run();
+    },
+    pause: () => {
+        renderedSimulation.pause();
+    },
+    reset: () => {
+        renderedSimulation.reset();
+    }
+};
+simulationFolder.add(simulationControls, 'run').name('Run');
+simulationFolder.add(simulationControls, 'pause').name('Pause');
+simulationFolder.add(simulationControls, 'reset').name('Reset');
+
 // const controls = {
 //     giroBase: -113,
 //     giroBrazo: -38,

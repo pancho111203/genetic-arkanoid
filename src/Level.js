@@ -42,6 +42,7 @@ class Level {
   }
 
   destroy() {
+    this.game.destroyAll();
     this.parentSimulation.scene.remove(this.scene);
     this.scene = null;
     this.game = null;

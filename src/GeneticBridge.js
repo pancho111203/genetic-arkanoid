@@ -35,10 +35,11 @@ class GeneticBridge {
     this.onFinishedCallbacks.push(cb);
   }
 
-  startOptimizer(level = 0, config) {
+  startOptimizer(level = 0, config, initialGeneration) {
     const msg = {
       level: level,
-      config: config
+      config: config,
+      initialGeneration
     };
 
     this.worker.postMessage(msg);

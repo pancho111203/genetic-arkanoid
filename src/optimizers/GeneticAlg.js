@@ -8,7 +8,6 @@ import { getRandom, getRandomInt, workerLog } from './helpers';
 class GeneticAlg extends GeneticAlgorithmGeneric {
   constructor(level, options) {
     super(options);
-
     this.mutationFunctions = {
       0: (config) => {
         if (getRandom(0, 1) > 0.5) {
@@ -59,6 +58,24 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
     return [pos, dir];
   }
 
+  select(pop) {
+    if (this.options.selectionOverTwo) {
+      const n = pop.length;
+      const a = pop[Math.floor(Math.random() * n)];
+      const b = pop[Math.floor(Math.random() * n)];
+      let best = this.optimizeFitness(a.fitness, b.fitness) ? a : b;
+      return best.config;
+    } else {
+      const n = pop.length;
+      const a = pop[Math.floor(Math.random() * n)];
+      const b = pop[Math.floor(Math.random() * n)];
+      const c = pop[Math.floor(Math.random() * n)];
+      let best = this.optimizeFitness(a.fitness, b.fitness) ? a : b;
+      best = this.optimizeFitness(best.fitness, c.fitness) ? best : c;
+      return best.config;
+    }
+  }
+
   seed() {
     const config = [];
     const num_balls = getRandomInt(1, this.options.maxBalls + 1);
@@ -95,12 +112,9 @@ class GeneticAlg extends GeneticAlgorithmGeneric {
         };
       });
       const simulation = new Simulation(false, levelConfigs, this.options.timestep, this.options.updatesPerTimestep);
-      workerLog('STARTED SIMULATION with levelConfigs:');
-      workerLog(levelConfigs);
       simulation.onFinished((data) => {
         simulation.terminate();
         const results = data.metrics;
-        workerLog(`FINISHED SIMULATION after ${data.secondsTaken} seconds`);
         if (results.length !== gen.length) {
           reject('Invalid number of results returned');
         }

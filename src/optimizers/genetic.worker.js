@@ -6,6 +6,7 @@ let genetic = null;
 self.onmessage = function (msg) {
   const level = msg.data.level;
   const config = msg.data.config;
+  const initialGeneration = msg.data.initialGeneration;
   if (genetic) {
     genetic.terminate();
     genetic = null;
@@ -30,7 +31,7 @@ self.onmessage = function (msg) {
     });
   });
 
-  genetic.evolve().then((res) => {
+  genetic.evolve(initialGeneration).then((res) => {
     workerLog('Last generation:');
     workerLog(res);
   });

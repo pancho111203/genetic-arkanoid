@@ -49,12 +49,15 @@ class GeneticAlgorithmGeneric {
     });
   }
 
-  async evolve() {
-    let gen = [];
-    for (let i = 0; i < this.options.size; i++) {
-      gen.push({
-        config: this.seed(),
-      });
+  async evolve(initialGeneration) {
+    let gen = initialGeneration;
+    if (!gen) {
+      gen = [];
+      for (let i = 0; i < this.options.size; i++) {
+        gen.push({
+          config: this.seed(),
+        });
+      }
     }
 
     for (let i = 0; i < this.options.steps && !this.shouldEnd; i++) {
