@@ -10,8 +10,6 @@ class Optimization {
     this.cantChangeSettings = false;
     this.addedGenerationsCallbacks = [];
     this.bridge.onGenerationReceived(({ generation, level, stats }) => {
-      console.log('Received new generation:');
-      console.log(generation);
       this.addGeneration(generation);
     });
   }

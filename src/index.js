@@ -91,6 +91,7 @@ optimization.onAddedGenerations((generations) => {
         const levelConf = optimization.getLevelConfigurationFromGeneration(gen);
         const control = {
             action: () => {
+                console.log(gen);
                 renderedSimulation.changeLevels(levelConf);
             }
         };
