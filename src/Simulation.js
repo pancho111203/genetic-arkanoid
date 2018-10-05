@@ -185,9 +185,7 @@ class Simulation {
   }
 
   reset() {
-    for (let lvl of this.levels) {
-      lvl.reset();
-    }
+    this.changeLevels(this.levelConfigurations);
   }
 
   changeLevels(levelConfigurations) {

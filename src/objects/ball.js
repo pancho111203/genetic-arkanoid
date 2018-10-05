@@ -78,19 +78,34 @@ class Ball extends GameObject {
 
       const nextPositionOnThisDirection = this.mesh.position.clone();
       nextPositionOnThisDirection.add(this.direction);
-      let [[collidesLeft, collidesRight, collidesDown, collidesUp], collisionObjects] = this.collisionDetector.checkCollisions(
+      let [[collidesLeft, collidesRight, collidesDown, collidesUp, collidesDownLeft, collidesDownRight, collidesUpRight, collidesUpLeft], collisionObjects] = this.collisionDetector.checkCollisions(
         nextPositionOnThisDirection,
         [[new THREE.Vector3(-1, 0, 0), BALL_RADIUS],
         [new THREE.Vector3(1, 0, 0), BALL_RADIUS], 
         [new THREE.Vector3(0, -1, 0), BALL_RADIUS],
-        [new THREE.Vector3(0, 1, 0), BALL_RADIUS]], this.level.scene.getObjectsOfGroups(['ballCollisions']))
-//      console.log(collidesLeft, collidesRight, collidesDown, collidesUp);
-      if (collidesLeft || collidesRight) {
-        this.direction.x = -this.direction.x;
-      }
+        [new THREE.Vector3(0, 1, 0), BALL_RADIUS],
+        [new THREE.Vector3(-1, -1, 0), BALL_RADIUS],
+        [new THREE.Vector3(1, -1, 0), BALL_RADIUS], 
+        [new THREE.Vector3(1, 1, 0), BALL_RADIUS],
+        [new THREE.Vector3(-1, 1, 0), BALL_RADIUS],], this.level.scene.getObjectsOfGroups(['ballCollisions']))
 
-      if (collidesDown || collidesUp) {
-        this.direction.y = -this.direction.y
+      const changeDirHorizontal = (collidesLeft || (collidesUpLeft && collidesDownLeft)) || (collidesRight || (collidesUpRight && collidesDownRight));
+      const changeDirVertical = (collidesUp || (collidesUpLeft && collidesUpRight)) || (collidesDown || (collidesDownLeft && collidesDownRight));
+      
+      if (changeDirVertical || changeDirHorizontal) {
+        if (changeDirHorizontal) {
+          this.direction.x = -this.direction.x;
+        }
+  
+        if (changeDirVertical) {
+          this.direction.y = -this.direction.y;
+        }
+      } else {
+        // edge cases
+        if (collidesDownLeft) {
+          this.direction.x = Math.abs(this.direction.x);
+          this.direction.y = -this.direction.y;
+        }
       }
 
       this.mesh.position.add(this.direction);
@@ -102,6 +117,7 @@ class Ball extends GameObject {
           this.level.game.destroy(colObj.userData.gameObject);
         }
       }
+      console.log([collidesLeft, collidesRight, collidesDown, collidesUp, collidesDownLeft, collidesDownRight, collidesUpRight, collidesUpLeft], collisionObjects);
     } else {
       this.arrowGrp.visible = true;
     }

@@ -10,7 +10,9 @@ class CollisionDetector {
 
   checkCollisions(origin, directions, meshes, recursive=true) {
     const isColliding = Array(directions.length).fill(false);
-    const collisionObjects = Array(directions.length).fill([]);
+    const collisionObjects = directions.map(() => {
+      return [];
+    });
 
     for (let directionIndex = 0; directionIndex < directions.length; directionIndex++) {
       const directionBundle = directions[directionIndex];
