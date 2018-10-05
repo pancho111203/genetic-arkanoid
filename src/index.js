@@ -10,7 +10,7 @@ const demoConfig = [{
     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
 }];
 
-const renderedSimulation = new Simulation(true, demoConfig, 2/60);
+const renderedSimulation = new Simulation(true, demoConfig, 1/60);
 
 const geneticSettings = {
     optimizer: 'genetic',

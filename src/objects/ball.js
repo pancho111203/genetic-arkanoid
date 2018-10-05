@@ -104,7 +104,16 @@ class Ball extends GameObject {
         // edge cases
         if (collidesDownLeft) {
           this.direction.x = Math.abs(this.direction.x);
-          this.direction.y = -this.direction.y;
+          this.direction.y = Math.abs(this.direction.y);
+        } else if (collidesUpLeft) {
+          this.direction.x = Math.abs(this.direction.x);
+          this.direction.y = -Math.abs(this.direction.y);
+        } else if (collidesDownRight) {
+          this.direction.x = -Math.abs(this.direction.x);
+          this.direction.y = Math.abs(this.direction.y);
+        } else if (collidesUpRight) {
+          this.direction.x = -Math.abs(this.direction.x);
+          this.direction.y = -Math.abs(this.direction.y);
         }
       }
 
@@ -117,7 +126,7 @@ class Ball extends GameObject {
           this.level.game.destroy(colObj.userData.gameObject);
         }
       }
-      console.log([collidesLeft, collidesRight, collidesDown, collidesUp, collidesDownLeft, collidesDownRight, collidesUpRight, collidesUpLeft], collisionObjects);
+//      console.log([collidesLeft, collidesRight, collidesDown, collidesUp, collidesDownLeft, collidesDownRight, collidesUpRight, collidesUpLeft], collisionObjects);
     } else {
       this.arrowGrp.visible = true;
     }
