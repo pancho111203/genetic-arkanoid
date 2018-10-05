@@ -130,7 +130,7 @@ optimization.onAddedGenerations((generations) => {
         const control = {
             action: () => {
                 if (simulationControls.howMany == 'one') {
-                    renderedSimulation.changeLevels(levelConf[0]);
+                    renderedSimulation.changeLevels([levelConf[0]]);
                 } else {
                     renderedSimulation.changeLevels(levelConf);
                 }
