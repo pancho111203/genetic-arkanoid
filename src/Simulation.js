@@ -5,6 +5,7 @@ import Camera from './objects/camera';
 import { getUrlVars } from './util';
 import Level from './Level';
 import { runsOnWorker } from './util';
+import ResourceLoader from './ResourceLoader';
 
 // TODO add listeners to notify on completion
 
@@ -26,6 +27,7 @@ class Simulation {
     };
 
     if (rendering) {
+      this.resourceLoader = new ResourceLoader();
       const cubeTexture = new THREE.CubeTextureLoader()
         .setPath('dist/textures/cube/skybox/')
         .load([

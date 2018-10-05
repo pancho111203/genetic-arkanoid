@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import ResourceLoader from '../ResourceLoader';
 import GameObject from '../generics/GameObject';
 import { tileHeight, tileWidth, tileDepth, wallWidth, nTilesV, nTilesH } from '../globals';
 
@@ -15,8 +14,7 @@ class Walls extends GameObject {
     const wallsGroup = new THREE.Group();
 
     if (level.parentSimulation.rendering) {
-      const loader = new ResourceLoader();
-      loader.load([['dist/textures/brick_diffuse.jpg', 'texture']]).then((resources) => {
+      level.parentSimulation.resourceLoader.load([['dist/textures/brick_diffuse.jpg', 'texture']]).then((resources) => {
         const texture = resources[0];
         texture.image.width = 128;
         texture.image.height = 128;
