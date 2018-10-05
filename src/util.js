@@ -1,3 +1,12 @@
+Object.defineProperty(Array.prototype, 'flat', {
+  value: function(depth = 1) {
+    return this.reduce(function (flat, toFlatten) {
+      return flat.concat((Array.isArray(toFlatten) && (depth-1)) ? toFlatten.flat(depth-1) : toFlatten);
+    }, []);
+  }
+});
+
+
 export function getUrlVars() {
   if (!window || !process.browser) {
     throw new Error('Cant get url vars when not rendering');
