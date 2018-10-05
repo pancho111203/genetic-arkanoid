@@ -18,7 +18,8 @@ class Simulation {
     this.rendering = rendering;
     this.scene = new THREE.Scene();
     this.scene.name = 'MainScene';
-
+    this.renderer = null;
+    this.camera = null;
     this.lastTime = undefined;
     this.delta = 0;
 
@@ -26,7 +27,10 @@ class Simulation {
       onFinished: []
     };
 
-    if (rendering) {
+    if (this.rendering && window && document) {
+      window.THREE = THREE;
+      window.scene = this.scene;
+
       this.resourceLoader = new ResourceLoader();
       const cubeTexture = new THREE.CubeTextureLoader()
         .setPath('dist/textures/cube/skybox/')
@@ -39,14 +43,10 @@ class Simulation {
           'nz.jpg'
         ]);
       this.scene.background = cubeTexture;
-    }
 
-
-    this.renderer = null;
-    this.camera = null;
-    if (this.rendering && window && document) {
-      window.THREE = THREE;
-      window.scene = this.scene;
+      const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+      ambientLight.name = 'Ambient Light';
+      this.scene.add(ambientLight);
 
       this.renderer = new THREE.WebGLRenderer();
       this.renderer.setSize(window.innerWidth - 4, window.innerHeight - 4);

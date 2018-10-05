@@ -4,7 +4,7 @@ import { tileHeight, tileWidth, tileDepth } from '../globals';
 
 const BRICK_HEIGHT = tileHeight;
 const BRICK_WIDTH = tileWidth;
-const BRICK_DEPTH = tileDepth;
+const BRICK_DEPTH = tileDepth - 0.6;
 
 const COLOR_MAP = [
   null,
