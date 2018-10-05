@@ -63,7 +63,22 @@ class Simulation {
 
     this.setLevels();
 
-    requestAnimationFrame((time) => this.mainLoop(time));
+    if (runsOnWorker()) {
+      this.mainLoopWorker().then(() => {
+      });
+    } else {
+      requestAnimationFrame((time) => this.mainLoop(time));
+    }
+  }
+
+  async mainLoopWorker() {
+    while (!this.terminated) {
+      await new Promise((resolve, reject) => {
+        this.update();
+        this.scene.updateMatrixWorld();
+        resolve();
+      });
+    }
   }
 
   onFinished(cb) {
