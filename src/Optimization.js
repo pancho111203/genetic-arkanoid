@@ -1,38 +1,50 @@
 import { downloadObjectAsJson, loadFileAsJson } from './util';
+import { clone } from './optimizers/helpers';
+import GeneticBridge from './GeneticBridge';
+import AnnealingBridge from './AnnealingBridge';
 
 class Optimization {
-  constructor(initialSettings, bridge) {
+  constructor(initialSettings) {
     this.generations = [];
-    this.bridge = bridge;
     this.bests = [];
-    this.settings = initialSettings;
+    this.settings = clone(initialSettings);
     this.bestFitness = 99999999999;
     this.cantChangeSettings = false;
     this.addedGenerationsCallbacks = [];
-    this.bridge.onGenerationReceived(({ generation, level, stats }) => {
-      this.addGeneration(generation);
-    });
   }
 
   startOptimizer() {
     console.log('Starting optimizer with settings:');
     console.log(this.settings);
+
+    if (this.settings.optimizer == 'genetic') {
+      this.bridge = new GeneticBridge();
+    } else if (this.settings.optimizer == 'annealing') {
+      this.bridge = new AnnealingBridge();
+    } else {
+      throw new Error('Invalid optimizer type');
+    }
+
+    this.bridge.onGenerationReceived(({ generation, level, stats }) => {
+      this.addGeneration(generation);
+    });
     this.bridge.startOptimizer(this.settings.level, this.settings);
     this.lockSettings();
   }
 
   setSettings(newSettings) {
+    const stns = clone(newSettings);
     if (!this.cantChangeSettings) {
-      this.settings = newSettings;
+      this.settings = stns;
     } else {
-      throw new Error('Cant change settings after the optimization has started!')
+      console.error('Cant change settings after the optimization has started!')
     }
   }
 
   getLevelConfigurationFromGeneration(generation) {
     return generation.map((ind) => {
       return {
-        levelNr: generation.level,
+        levelNr: this.settings.level,
         balls: ind.config
       };
     });

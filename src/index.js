@@ -2,7 +2,7 @@ import * as dat from 'dat.gui';
 import Simulation from './Simulation';
 import Optimization from './Optimization';
 import { getUrlVars, downloadObjectAsJson } from './util';
-import GeneticBridge from './GeneticBridge';
+
 
 const levelNr = getUrlVars()['level'] || 0;
 const demoConfig = [{
@@ -12,8 +12,9 @@ const demoConfig = [{
 
 const renderedSimulation = new Simulation(true, demoConfig);
 
-const geneticOptions = {
-    level: 0,
+const geneticSettings = {
+    optimizer: 'genetic',
+    level: levelNr,
     size: 10,
     steps: 100,
     keepBest: true,
@@ -28,8 +29,20 @@ const geneticOptions = {
     selectionOverTwo: true
 };
 
-const geneticBridge = new GeneticBridge();
-const optimization = new Optimization(geneticOptions, geneticBridge);
+const annealingSettings = {
+    optimizer: 'annealing',
+    level: levelNr,
+    initialTemperature: 100,
+    maxIterations: 100000,
+    coolingFactor: 0.9,
+    timestep: 1 / 60,
+    updatesPerTimestep: 1000,
+    fitnessFunction: 0,
+    successorFunction: 0,
+    coolingFunction: 0
+};
+
+const optimization = new Optimization(geneticSettings);
 
 const gui = new dat.GUI();
 
@@ -47,26 +60,49 @@ downloadFolder.add(controls, 'historyFilename').name('Download File Name');
 downloadFolder.add(controls, 'download').name('Download');
 downloadFolder.add(controls, 'loadHistory').name('Load');
 
-const geneticFolder = gui.addFolder('Genetic');
-const geneticControls = {
+const optimizerFolder = gui.addFolder('Optimizer');
+const optimizerControls = {
     evolve: () => {
+        let settings;
+        if (optimizerControls.optimizer == 'genetic') {
+            settings = geneticSettings;
+        } else {
+            settings = annealingSettings;
+        }
+        optimization.setSettings(settings);
         optimization.startOptimizer();
-    }
+    },
+    optimizer: 'genetic'
 };
-geneticFolder.add(geneticControls, 'evolve').name('Start Evolution');
-geneticFolder.add(geneticOptions, 'level');
-geneticFolder.add(geneticOptions, 'size');
-geneticFolder.add(geneticOptions, 'steps');
-geneticFolder.add(geneticOptions, 'keepBest');
-geneticFolder.add(geneticOptions, 'timestep');
-geneticFolder.add(geneticOptions, 'updatesPerTimestep');
-geneticFolder.add(geneticOptions, 'maxBalls');
-geneticFolder.add(geneticOptions, 'fixedNumberOfBalls');
-geneticFolder.add(geneticOptions, 'mutationFunction');
-geneticFolder.add(geneticOptions, 'crossoverFunction');
-geneticFolder.add(geneticOptions, 'fitnessFunction');
-geneticFolder.add(geneticOptions, 'replaceFunction');
-geneticFolder.add(geneticOptions, 'selectionOverTwo');
+optimizerFolder.add(optimizerControls, 'optimizer', ['genetic', 'annealing']);
+optimizerFolder.add(optimizerControls, 'evolve').name('Start Evolution');
+
+const geneticFolder = optimizerFolder.addFolder('Genetic');
+geneticFolder.add(geneticSettings, 'level');
+geneticFolder.add(geneticSettings, 'size');
+geneticFolder.add(geneticSettings, 'steps');
+geneticFolder.add(geneticSettings, 'keepBest');
+geneticFolder.add(geneticSettings, 'timestep');
+geneticFolder.add(geneticSettings, 'updatesPerTimestep');
+geneticFolder.add(geneticSettings, 'maxBalls');
+geneticFolder.add(geneticSettings, 'fixedNumberOfBalls');
+geneticFolder.add(geneticSettings, 'mutationFunction');
+geneticFolder.add(geneticSettings, 'crossoverFunction');
+geneticFolder.add(geneticSettings, 'fitnessFunction');
+geneticFolder.add(geneticSettings, 'replaceFunction');
+geneticFolder.add(geneticSettings, 'selectionOverTwo');
+
+const annealingFolder = optimizerFolder.addFolder('Annealing');
+annealingFolder.add(annealingSettings, 'level');
+annealingFolder.add(annealingSettings, 'initialTemperature');
+annealingFolder.add(annealingSettings, 'maxIterations');
+annealingFolder.add(annealingSettings, 'coolingFactor');
+annealingFolder.add(annealingSettings, 'timestep');
+annealingFolder.add(annealingSettings, 'updatesPerTimestep');
+annealingFolder.add(annealingSettings, 'fitnessFunction');
+annealingFolder.add(annealingSettings, 'successorFunction');
+annealingFolder.add(annealingSettings, 'coolingFunction');
+
 
 const simulationFolder = gui.addFolder('Simulation');
 const simulationControls = {
@@ -78,8 +114,10 @@ const simulationControls = {
     },
     reset: () => {
         renderedSimulation.reset();
-    }
+    },
+    howMany: 'all'
 };
+simulationFolder.add(simulationControls, 'howMany', ['all', 'one']).name('Sims to run');
 simulationFolder.add(simulationControls, 'run').name('Run');
 simulationFolder.add(simulationControls, 'pause').name('Pause');
 simulationFolder.add(simulationControls, 'reset').name('Reset');
@@ -91,14 +129,17 @@ optimization.onAddedGenerations((generations) => {
         const levelConf = optimization.getLevelConfigurationFromGeneration(gen);
         const control = {
             action: () => {
-                console.log(gen);
-                renderedSimulation.changeLevels(levelConf);
+                if (simulationControls.howMany == 'one') {
+                    renderedSimulation.changeLevels(levelConf[0]);
+                } else {
+                    renderedSimulation.changeLevels(levelConf);
+                }
             }
         };
         const bestFitness = optimization.getBestFitnessOfGeneration(gen);
         const isBest = optimization.bests[currentIndex];
 
-        const name = isBest ? `${currentIndex} - ${bestFitness} - NEW BEST` :  `${currentIndex} - ${bestFitness}`;
+        const name = isBest ? `${currentIndex} - ${bestFitness} - NEW BEST` : `${currentIndex} - ${bestFitness}`;
         generationsFolder.add(control, 'action').name(name);
         currentIndex += 1;
     }
