@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import GameObject from '../generics/GameObject';
 import { tileHeight, tileWidth, tileDepth, wallWidth, nTilesV, nTilesH } from '../globals';
+import { textures } from '../visuals';
 
 const WALLS_HEIGHT = (nTilesV * tileHeight) + (wallWidth * 2);
 const WALLS_WIDTH = (nTilesH * tileWidth) + (wallWidth * 2);
@@ -12,22 +13,32 @@ class Walls extends GameObject {
     super(level, name);
 
     if (level.parentSimulation.rendering) {
-      level.parentSimulation.resourceLoader.load([['dist/textures/brick_diffuse.jpg', 'texture']]).then((resources) => {
-        const texture = resources[0];
-        texture.image.width = 128;
-        texture.image.height = 128;
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      level.parentSimulation.resourceLoader.load([[textures.walls, 'texture'], [textures.back, 'texture']]).then((resources) => {
+        const wallsTexture = resources[0];
+//        wallsTexture.image.width = 128;
+//        wallsTexture.image.height = 128;
+        wallsTexture.wrapS = wallsTexture.wrapT = THREE.RepeatWrapping;
 
-        const textureVertical = texture.clone();
-        textureVertical.repeat.set(1, 10);
+        const textureVertical = wallsTexture.clone();
+        const rpt1 = 1;
+        textureVertical.repeat.set(rpt1, rpt1*30);
         textureVertical.needsUpdate = true;
         const materialVertical = new THREE.MeshBasicMaterial({ map: textureVertical });
 
-        const textureHorizontal = texture.clone();
-        textureHorizontal.repeat.set(10, 1);
+        const textureHorizontal = wallsTexture.clone();
+        textureHorizontal.repeat.set(rpt1*30, rpt1);
         textureHorizontal.needsUpdate = true;
         const materialHorizontal = new THREE.MeshBasicMaterial({ map: textureHorizontal });
-        const materialBack = new THREE.MeshBasicMaterial({ color: 'yellow', side: THREE.DoubleSide });
+
+
+
+        const backTexture = resources[1];
+        backTexture.wrapS = backTexture.wrapT = THREE.RepeatWrapping;
+        const rpt = 20;
+        backTexture.repeat.set(rpt, rpt*1.25);
+        backTexture.needsUpdate = true;
+
+        const materialBack = new THREE.MeshBasicMaterial({ map: backTexture, side: THREE.DoubleSide });
 
         const mesh = this.createMesh(materialVertical, materialHorizontal, materialBack);
         this.loadMeshToScene(mesh);
@@ -69,7 +80,6 @@ class Walls extends GameObject {
 
     const back = new THREE.Mesh(new THREE.PlaneGeometry(WALLS_WIDTH, WALLS_HEIGHT), materialBack);
     back.position.z = (-WALLS_DEPTH / 2) + 0.2;
-
     const wallsAndBack = new THREE.Group();
     wallsAndBack.add(wallsGroup);
     wallsAndBack.add(back);
