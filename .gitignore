@@ -1,3 +1,6 @@
 node_modules
 dist
 yarn-error.log
+!dist/images
+!dist/models
+!dist/textures
