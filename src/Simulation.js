@@ -123,7 +123,7 @@ class Simulation {
       const y = Math.floor(i / 5);
       const index = this.levels.length;
 //      const level = new Level(this, levelNr, new THREE.Vector3(-120 * x, 150 * y, 0), balls);
-      const level = new Level(this, levelNr, new THREE.Vector3(-150 * x, 180 * y, 0), balls);
+      const level = new Level(this, levelNr, new THREE.Vector3(-170 * x, 250 * y, 0), balls);
       level.metrics.onFinished(this.trackLevelHasFinished(index));
       this.levels.push(level);
       this.finishedLevelsMetrics.push(null);

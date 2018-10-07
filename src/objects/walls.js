@@ -21,10 +21,11 @@ class Walls extends GameObject {
 
       const mesh = this.createMesh(materialVertical, materialHorizontal, materialBack);
 
-      var spotLight = new THREE.SpotLight(0xffffff, 1.2);
+      var spotLight = new THREE.SpotLight(0xffffff, 1.2, 2750, 0.45);
       spotLight.name = 'Spotlight';
-      spotLight.position.set(9, 100, 200);
-      spotLight.rotation.set(0.5, 0.2, 0.9)
+      spotLight.position.set(0, 100, 200);
+      spotLight.rotation.set(0, 0, 0);
+      spotLight.target = mesh;
       spotLight.castShadow = true;
       //        spotLight.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(60, 1, 1, 2500));
       //        spotLight.shadow.bias = 0.0001;

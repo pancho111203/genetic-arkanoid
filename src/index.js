@@ -11,6 +11,38 @@ const demoConfig = [{
     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
 }];
 
+// const demoConfig = [{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },{
+//     levelNr: levelNr,
+//     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
+// },];
+
 const renderedSimulation = new Simulation(true, demoConfig, 1/60);
 
 const geneticSettings = {
@@ -118,7 +150,7 @@ const simulationControls = {
     },
     howMany: 'one'
 };
-simulationFolder.add(simulationControls, 'howMany', ['one']).name('Sims to run');
+simulationFolder.add(simulationControls, 'howMany', ['one', 'all']).name('Sims to run');
 simulationFolder.add(simulationControls, 'run').name('Run');
 simulationFolder.add(simulationControls, 'pause').name('Pause');
 simulationFolder.add(simulationControls, 'reset').name('Reset');
