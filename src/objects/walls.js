@@ -13,37 +13,30 @@ class Walls extends GameObject {
     super(level, name);
 
     if (level.parentSimulation.rendering) {
-      level.parentSimulation.resourceLoader.load([[textures.walls, 'texture'], [textures.back, 'texture']]).then((resources) => {
-        const wallsTexture = resources[0];
-//        wallsTexture.image.width = 128;
-//        wallsTexture.image.height = 128;
-        wallsTexture.wrapS = wallsTexture.wrapT = THREE.RepeatWrapping;
+      const materialVertical = new THREE.MeshLambertMaterial({ color: 0x784629 });
 
-        const textureVertical = wallsTexture.clone();
-        const rpt1 = 1;
-        textureVertical.repeat.set(rpt1, rpt1*30);
-        textureVertical.needsUpdate = true;
-        const materialVertical = new THREE.MeshBasicMaterial({ map: textureVertical });
+      const materialHorizontal = new THREE.MeshLambertMaterial({ color: 0x784629 });
 
-        const textureHorizontal = wallsTexture.clone();
-        textureHorizontal.repeat.set(rpt1*30, rpt1);
-        textureHorizontal.needsUpdate = true;
-        const materialHorizontal = new THREE.MeshBasicMaterial({ map: textureHorizontal });
+      const materialBack = new THREE.MeshLambertMaterial({ color: 'grey', side: THREE.DoubleSide });
 
+      const mesh = this.createMesh(materialVertical, materialHorizontal, materialBack);
 
+      var spotLight = new THREE.SpotLight(0xffffff, 1.2);
+      spotLight.name = 'Spotlight';
+      spotLight.position.set(9, 100, 200);
+      spotLight.rotation.set(0.5, 0.2, 0.9)
+      spotLight.castShadow = true;
+      //        spotLight.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(60, 1, 1, 2500));
+      //        spotLight.shadow.bias = 0.0001;
+      //        spotLight.distance = 2000;
 
-        const backTexture = resources[1];
-        backTexture.wrapS = backTexture.wrapT = THREE.RepeatWrapping;
-        const rpt = 20;
-        backTexture.repeat.set(rpt, rpt*1.25);
-        backTexture.needsUpdate = true;
+      mesh.add(spotLight);
 
-        const materialBack = new THREE.MeshBasicMaterial({ map: backTexture, side: THREE.DoubleSide });
+      //  var spotLightHelper = new THREE.SpotLightHelper(spotLight);
+      //  mesh.add(spotLightHelper);
 
-        const mesh = this.createMesh(materialVertical, materialHorizontal, materialBack);
-        this.loadMeshToScene(mesh);
-        this.loaded = true;
-      });
+      this.loadMeshToScene(mesh);
+      this.loaded = true;
     } else {
       const materialBack = new THREE.MeshBasicMaterial({ color: 'yellow', side: THREE.DoubleSide });
       const material = new THREE.MeshBasicMaterial({ color: 'red' });
@@ -58,21 +51,25 @@ class Walls extends GameObject {
     const left = new THREE.Mesh(new THREE.BoxGeometry(WALLS_THICKNESS, WALLS_HEIGHT, WALLS_DEPTH), materialVertical);
     left.name = 'Left';
     left.position.x = wallsGroup.position.x - (WALLS_WIDTH / 2 - WALLS_THICKNESS / 2);
+    left.receiveShadow = true;
     wallsGroup.add(left);
 
     const right = new THREE.Mesh(new THREE.BoxGeometry(WALLS_THICKNESS, WALLS_HEIGHT, WALLS_DEPTH), materialVertical);
     right.name = 'Right';
     right.position.x = wallsGroup.position.x + (WALLS_WIDTH / 2 - WALLS_THICKNESS / 2);
+    right.receiveShadow = true;
     wallsGroup.add(right);
 
     const top = new THREE.Mesh(new THREE.BoxGeometry(WALLS_WIDTH, WALLS_THICKNESS, WALLS_DEPTH), materialHorizontal);
     top.name = 'Top';
     top.position.y = wallsGroup.position.y + (WALLS_HEIGHT / 2 - WALLS_THICKNESS / 2);
+    top.receiveShadow = true;
     wallsGroup.add(top);
 
     const bottom = new THREE.Mesh(new THREE.BoxGeometry(WALLS_WIDTH, WALLS_THICKNESS, WALLS_DEPTH), materialHorizontal);
     bottom.name = 'Bottom';
     bottom.position.y = wallsGroup.position.y - (WALLS_HEIGHT / 2 - WALLS_THICKNESS / 2);
+    bottom.receiveShadow = true;
     wallsGroup.add(bottom);
 
     wallsGroup.userData.groups = ['ballCollisions'];
@@ -80,6 +77,8 @@ class Walls extends GameObject {
 
     const back = new THREE.Mesh(new THREE.PlaneGeometry(WALLS_WIDTH, WALLS_HEIGHT), materialBack);
     back.position.z = (-WALLS_DEPTH / 2) + 0.2;
+    back.receiveShadow = true;
+
     const wallsAndBack = new THREE.Group();
     wallsAndBack.add(wallsGroup);
     wallsAndBack.add(back);

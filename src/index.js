@@ -5,6 +5,7 @@ import { getUrlVars, downloadObjectAsJson } from './util';
 
 
 const levelNr = getUrlVars()['level'] || 0;
+
 const demoConfig = [{
     levelNr: levelNr,
     balls: [[[-34.09, -25.18, 0], [-0.67, 0.74, 0]]]
@@ -115,9 +116,9 @@ const simulationControls = {
     reset: () => {
         renderedSimulation.reset();
     },
-    howMany: 'all'
+    howMany: 'one'
 };
-simulationFolder.add(simulationControls, 'howMany', ['all', 'one']).name('Sims to run');
+simulationFolder.add(simulationControls, 'howMany', ['one']).name('Sims to run');
 simulationFolder.add(simulationControls, 'run').name('Run');
 simulationFolder.add(simulationControls, 'pause').name('Pause');
 simulationFolder.add(simulationControls, 'reset').name('Reset');

@@ -44,15 +44,21 @@ class Simulation {
         ]);
       this.scene.background = cubeTexture;
 
-      const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
-      ambientLight.name = 'Ambient Light';
-      this.scene.add(ambientLight);
 
       this.renderer = new THREE.WebGLRenderer();
       this.renderer.setSize(window.innerWidth - 4, window.innerHeight - 4);
       document.body.appendChild(this.renderer.domElement);
 
-      this.camera = new Camera(this.renderer);
+      this.renderer.shadowMap.enabled = true;
+      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      this.camera = new Camera(this.renderer, this.scene);
+
+      const ambientLight = new THREE.AmbientLight(0x404040); // soft white light
+      ambientLight.name = 'Ambient Light';
+
+      this.scene.add(ambientLight);
+
 
       window.addEventListener('resize', () => {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -116,7 +122,8 @@ class Simulation {
       const x = i % 5;
       const y = Math.floor(i / 5);
       const index = this.levels.length;
-      const level = new Level(this, levelNr, new THREE.Vector3(-120 * x, 150 * y, 0), balls);
+//      const level = new Level(this, levelNr, new THREE.Vector3(-120 * x, 150 * y, 0), balls);
+      const level = new Level(this, levelNr, new THREE.Vector3(-150 * x, 180 * y, 0), balls);
       level.metrics.onFinished(this.trackLevelHasFinished(index));
       this.levels.push(level);
       this.finishedLevelsMetrics.push(null);

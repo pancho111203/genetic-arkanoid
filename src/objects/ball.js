@@ -12,7 +12,7 @@ const BALL_SCALE = 1;
 const SPEED = 1;
 
 class Ball extends GameObject {
-  constructor(level, name, initialDirection, initialPosition, color = 0xe5ebec, arrowColor = 0xe5ebec) {
+  constructor(level, name, initialDirection, initialPosition, color = 0xe5ebec, arrowColor = 0xe5ebec, lightOn = false) {
     super(level, name);
 
     if (initialDirection) {
@@ -23,15 +23,17 @@ class Ball extends GameObject {
 
     //    const geometry = new THREE.CylinderGeometry(10, 10, 30);
     const geometry = new THREE.SphereGeometry(BALL_RADIUS, BALL_WIDTH_SEGMENTS, BALL_HEIGHT_SEGMENTS);
-    const material = new THREE.MeshBasicMaterial({ color: color, envMap: this.level.parentSimulation.scene.background });
+    const material = new THREE.MeshPhongMaterial({ color: color, envMap: this.level.parentSimulation.scene.background });
     const ball = new THREE.Mesh(geometry, material);
-
+    ball.castShadow = true;
     this.arrowGrp = new THREE.Group();
     this.arrowGrp.name = 'Arrow';
-    const arrowMaterial = new THREE.MeshBasicMaterial({ color: arrowColor });
+    const arrowMaterial = new THREE.MeshPhongMaterial({ color: arrowColor });
 
     const arrowBase = new THREE.Mesh(new THREE.CylinderGeometry(BALL_RADIUS / 2, BALL_RADIUS / 2, BALL_RADIUS * 1.5), arrowMaterial);
     const arrowEdge = new THREE.Mesh(new THREE.CylinderGeometry(0, BALL_RADIUS, BALL_RADIUS), arrowMaterial);
+    arrowBase.castShadow = true;
+    arrowEdge.castShadow = true;
     arrowEdge.position.y = BALL_RADIUS * 1;
 
     this.arrowGrp.add(arrowBase);
@@ -43,6 +45,11 @@ class Ball extends GameObject {
     this.mesh.add(ball);
     this.mesh.add(this.arrowGrp);
 
+    if (lightOn) {
+      var light = new THREE.PointLight(0xffffff, 10, 100, 1);
+      this.mesh.add(light);
+    }
+
     this.mesh.scale.x = BALL_SCALE;
     this.mesh.scale.y = BALL_SCALE;
     this.mesh.scale.z = BALL_SCALE;
@@ -52,7 +59,7 @@ class Ball extends GameObject {
     } else {
       this.mesh.position.set(0, 20, 0);
     }
-
+    this.mesh.castShadow = true;
     this.loadMeshToScene(this.mesh);
     this.collisionDetector = new CollisionDetector(this);
     this.setArrowMatrix();
@@ -81,22 +88,22 @@ class Ball extends GameObject {
       let [[collidesLeft, collidesRight, collidesDown, collidesUp, collidesDownLeft, collidesDownRight, collidesUpRight, collidesUpLeft], collisionObjects] = this.collisionDetector.checkCollisions(
         nextPositionOnThisDirection,
         [[new THREE.Vector3(-1, 0, 0), BALL_RADIUS],
-        [new THREE.Vector3(1, 0, 0), BALL_RADIUS], 
+        [new THREE.Vector3(1, 0, 0), BALL_RADIUS],
         [new THREE.Vector3(0, -1, 0), BALL_RADIUS],
         [new THREE.Vector3(0, 1, 0), BALL_RADIUS],
         [new THREE.Vector3(-1, -1, 0), BALL_RADIUS],
-        [new THREE.Vector3(1, -1, 0), BALL_RADIUS], 
+        [new THREE.Vector3(1, -1, 0), BALL_RADIUS],
         [new THREE.Vector3(1, 1, 0), BALL_RADIUS],
         [new THREE.Vector3(-1, 1, 0), BALL_RADIUS],], this.level.scene.getObjectsOfGroups(['ballCollisions']))
 
       const changeDirHorizontal = (collidesLeft || (collidesUpLeft && collidesDownLeft)) || (collidesRight || (collidesUpRight && collidesDownRight));
       const changeDirVertical = (collidesUp || (collidesUpLeft && collidesUpRight)) || (collidesDown || (collidesDownLeft && collidesDownRight));
-      
+
       if (changeDirVertical || changeDirHorizontal) {
         if (changeDirHorizontal) {
           this.direction.x = -this.direction.x;
         }
-  
+
         if (changeDirVertical) {
           this.direction.y = -this.direction.y;
         }
@@ -126,7 +133,7 @@ class Ball extends GameObject {
           this.level.game.destroy(colObj.userData.gameObject);
         }
       }
-//      console.log([collidesLeft, collidesRight, collidesDown, collidesUp, collidesDownLeft, collidesDownRight, collidesUpRight, collidesUpLeft], collisionObjects);
+      //      console.log([collidesLeft, collidesRight, collidesDown, collidesUp, collidesDownLeft, collidesDownRight, collidesUpRight, collidesUpLeft], collisionObjects);
     } else {
       this.arrowGrp.visible = true;
     }

@@ -20,7 +20,7 @@
 
 export const textures = {
   walls: 'dist/textures/minecraft/blocks/log_jungle.png',
-  back: 'dist/textures/minecraft/blocks/planks_jungle.png',
+  back: 'dist/textures/TexturesCom_MetalFloorsBare0021_1_seamless_S.png',
   ball: '',
   bricks: [
     null,
