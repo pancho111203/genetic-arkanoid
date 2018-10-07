@@ -19,7 +19,7 @@
 // }
 
 export const textures = {
-  walls: 'dist/textures/minecraft/blocks/log_jungle.png',
+  walls: 'dist/textures/TexturesCom_PlainBricks_1024_albedo.png',
   back: 'dist/textures/TexturesCom_MetalFloorsBare0021_1_seamless_S.png',
   ball: '',
   bricks: [

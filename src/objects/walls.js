@@ -13,31 +13,50 @@ class Walls extends GameObject {
     super(level, name);
 
     if (level.parentSimulation.rendering) {
-      const materialVertical = new THREE.MeshLambertMaterial({ color: 0x784629 });
-
-      const materialHorizontal = new THREE.MeshLambertMaterial({ color: 0x784629 });
-
-      const materialBack = new THREE.MeshLambertMaterial({ color: 'grey', side: THREE.DoubleSide });
-
-      const mesh = this.createMesh(materialVertical, materialHorizontal, materialBack);
-
-      var spotLight = new THREE.SpotLight(0xffffff, 1.2, 2750, 0.45);
-      spotLight.name = 'Spotlight';
-      spotLight.position.set(0, 100, 200);
-      spotLight.rotation.set(0, 0, 0);
-      spotLight.target = mesh;
-      spotLight.castShadow = true;
-      //        spotLight.shadow = new THREE.LightShadow(new THREE.PerspectiveCamera(60, 1, 1, 2500));
-      //        spotLight.shadow.bias = 0.0001;
-      //        spotLight.distance = 2000;
-
-      mesh.add(spotLight);
-
-      //  var spotLightHelper = new THREE.SpotLightHelper(spotLight);
-      //  mesh.add(spotLightHelper);
-
-      this.loadMeshToScene(mesh);
-      this.loaded = true;
+      level.parentSimulation.resourceLoader.load([[textures.walls, 'texture'], [textures.back, 'texture']]).then((resources) => {
+        const wallsTexture = resources[0];
+        //        wallsTexture.image.width = 128;
+        //        wallsTexture.image.height = 128;
+        wallsTexture.wrapS = wallsTexture.wrapT = THREE.RepeatWrapping;
+    
+        const textureVertical = wallsTexture.clone();
+        const rpt1 = 1;
+        textureVertical.repeat.set(rpt1, rpt1 * 30);
+        textureVertical.needsUpdate = true;
+        const materialVertical = new THREE.MeshLambertMaterial({ map: textureVertical });
+    
+        const textureHorizontal = wallsTexture.clone();
+        textureHorizontal.repeat.set(rpt1 * 30, rpt1);
+        textureHorizontal.needsUpdate = true;
+        const materialHorizontal = new THREE.MeshLambertMaterial({ map: textureHorizontal });
+    
+        // const materialVertical = new THREE.MeshLambertMaterial({ color: 0x784629 });
+        // const materialHorizontal = new THREE.MeshLambertMaterial({ color: 0x784629 });
+        // const materialBack = new THREE.MeshLambertMaterial({ color: 'grey', side: THREE.DoubleSide });
+    
+    
+        const backTexture = resources[1];
+        backTexture.wrapS = backTexture.wrapT = THREE.RepeatWrapping;
+        const rpt = 20;
+        backTexture.repeat.set(rpt, rpt * 1.25);
+        backTexture.needsUpdate = true;
+    
+        const materialBack = new THREE.MeshLambertMaterial({ map: backTexture, side: THREE.DoubleSide });
+    
+        const mesh = this.createMesh(materialVertical, materialHorizontal, materialBack);
+    
+          var spotLight = new THREE.SpotLight(0xffffff, 1.2, 2750, 0.45);
+          spotLight.name = 'Spotlight';
+          spotLight.position.set(0, 100, 200);
+          spotLight.rotation.set(0, 0, 0);
+          spotLight.target = mesh;
+          spotLight.castShadow = true;
+    
+          mesh.add(spotLight);
+    
+          this.loadMeshToScene(mesh);
+          this.loaded = true;
+      });
     } else {
       const materialBack = new THREE.MeshBasicMaterial({ color: 'yellow', side: THREE.DoubleSide });
       const material = new THREE.MeshBasicMaterial({ color: 'red' });
@@ -89,3 +108,5 @@ class Walls extends GameObject {
 }
 
 export default Walls;
+
+
