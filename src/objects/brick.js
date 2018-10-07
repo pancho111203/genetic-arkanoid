@@ -26,29 +26,41 @@ class Brick extends GameObject {
     super(level, name);
 
     this.onDestroyedCb = onDestroyedCb;
+    if (level.parentSimulation.rendering) {
+      level.parentSimulation.resourceLoader.load([[textures.bricks[tileType], 'texture']]).then((resources) => {
+        const texture = resources[0];
+        //      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        const rpt = 3;
+        //      texture.repeat.set(rpt, rpt*0.5);
+        //      texture.needsUpdate = true;
 
-    level.parentSimulation.resourceLoader.load([[textures.bricks[tileType], 'texture']]).then((resources) => {
-      const texture = resources[0];
-      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      const rpt = 3;
-      texture.repeat.set(rpt, rpt*0.5);
-      texture.needsUpdate = true;
-  
-      const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-      //const material = new THREE.MeshBasicMaterial( {color: new THREE.Color(`rgb(${rgbCodes[0]}, ${rgbCodes[1]}, ${rgbCodes[2]})`)} );
+        const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
 
-      const geometry = new THREE.BoxGeometry(BRICK_WIDTH, BRICK_HEIGHT, BRICK_DEPTH);
+        const geometry = new THREE.BoxGeometry(BRICK_WIDTH, BRICK_HEIGHT, BRICK_DEPTH);
+        const brick = new THREE.Mesh(geometry, material);
+        brick.userData.groups = ['ballCollisions', 'destroyable'];
+
+        if (startPositionTopLeft) {
+          brick.position.set(startPositionTopLeft.x + BRICK_WIDTH / 2, startPositionTopLeft.y - BRICK_HEIGHT / 2, startPositionTopLeft.z);
+        }
+
+        this.loadMeshToScene(brick);
+        this.loaded = true;
+      });
+    } else {
       const rgbCodes = COLOR_MAP[tileType];
-      const brick = new THREE.Mesh( geometry, material );
+      const material = new THREE.MeshBasicMaterial({ color: new THREE.Color(`rgb(${rgbCodes[0]}, ${rgbCodes[1]}, ${rgbCodes[2]})`) });
+      const geometry = new THREE.BoxGeometry(BRICK_WIDTH, BRICK_HEIGHT, BRICK_DEPTH);
+      const brick = new THREE.Mesh(geometry, material);
       brick.userData.groups = ['ballCollisions', 'destroyable'];
-  
+
       if (startPositionTopLeft) {
-        brick.position.set(startPositionTopLeft.x + BRICK_WIDTH/2, startPositionTopLeft.y - BRICK_HEIGHT/2, startPositionTopLeft.z);
+        brick.position.set(startPositionTopLeft.x + BRICK_WIDTH / 2, startPositionTopLeft.y - BRICK_HEIGHT / 2, startPositionTopLeft.z);
       }
-      
+
       this.loadMeshToScene(brick);
       this.loaded = true;
-    });
+    }
   }
 
   destroy() {
@@ -58,7 +70,7 @@ class Brick extends GameObject {
       if (this.onDestroyedCb) {
         this.onDestroyedCb();
       }
-      
+
       this.level.scene.remove(this.mesh);
     }
   }

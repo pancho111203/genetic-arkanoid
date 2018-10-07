@@ -12,7 +12,7 @@ const BALL_SCALE = 1;
 const SPEED = 1;
 
 class Ball extends GameObject {
-  constructor(level, name, initialDirection, initialPosition, color = 0x38e1ec) {
+  constructor(level, name, initialDirection, initialPosition, color = 0xe5ebec, arrowColor = 0xe5ebec) {
     super(level, name);
 
     if (initialDirection) {
@@ -28,7 +28,7 @@ class Ball extends GameObject {
 
     this.arrowGrp = new THREE.Group();
     this.arrowGrp.name = 'Arrow';
-    const arrowMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const arrowMaterial = new THREE.MeshBasicMaterial({ color: arrowColor });
 
     const arrowBase = new THREE.Mesh(new THREE.CylinderGeometry(BALL_RADIUS / 2, BALL_RADIUS / 2, BALL_RADIUS * 1.5), arrowMaterial);
     const arrowEdge = new THREE.Mesh(new THREE.CylinderGeometry(0, BALL_RADIUS, BALL_RADIUS), arrowMaterial);
