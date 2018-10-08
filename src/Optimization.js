@@ -124,15 +124,19 @@ class Optimization {
     downloadObjectAsJson({ generations: this.generations, settings: this.settings }, filename);
   }
 
+  load(settings, generations) {
+    this.clean();
+    this.setSettings(settings);
+    this.setGenerations(generations);
+    this.lockSettings();
+  }
+
   loadFromFile() {
     loadFileAsJson((json) => {
       const settings = json.settings;
       const generations = json.generations;
 
-      this.clean();
-      this.setSettings(settings);
-      this.setGenerations(generations);
-      this.lockSettings();
+      this.load(settings, generations);
     });
   }
 }

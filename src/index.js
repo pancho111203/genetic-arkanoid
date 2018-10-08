@@ -3,7 +3,18 @@ import Simulation from './Simulation';
 import Optimization from './Optimization';
 import { getUrlVars, downloadObjectAsJson } from './util';
 
-
+import lvl13_6246 from '../dist/results/genetic_lvl13_6246.json';
+import lvl13_6374 from '../dist/results/genetic_lvl13_6374.json';
+import lvl15_5371 from '../dist/results/genetic_lvl15_5371.json';
+import lvl15_5988_fixed4 from '../dist/results/genetic_lvl15_5988_fixed4.json';
+import lvl15_6615 from '../dist/results/genetic_lvl15_6615.json';
+import lvl19_3624 from '../dist/results/genetic_lvl19_3624.json';
+import lvl19_4588 from '../dist/results/genetic_lvl19_4588.json';
+import lvl20_3324 from '../dist/results/genetic_lvl20_3324.json';
+import lvl20_3390 from '../dist/results/genetic_lvl20_3390.json';
+import lvl20_3840 from '../dist/results/genetic_lvl20_3840.json';
+import lvl20_4459 from '../dist/results/genetic_lvl20_4459.json';
+ 
 const levelNr = getUrlVars()['level'] || 0;
 
 const demoConfig = [{
@@ -79,6 +90,20 @@ const optimization = new Optimization(geneticSettings);
 
 const gui = new dat.GUI();
 
+const serverFiles = {
+    lvl13_6246: lvl13_6246,
+    lvl13_6374: lvl13_6374,
+    lvl15_5371: lvl15_5371,
+    lvl15_5988_fixed4: lvl15_5988_fixed4,
+    lvl15_6615: lvl15_6615,
+    lvl19_3624: lvl19_3624,
+    lvl19_4588: lvl19_4588,
+    lvl20_3324: lvl20_3324,
+    lvl20_3390: lvl20_3390,
+    lvl20_3840: lvl20_3840,
+    lvl20_4459: lvl20_4459
+};
+
 const downloadFolder = gui.addFolder('Download');
 const controls = {
     historyFilename: 'unnamed.metrics',
@@ -87,11 +112,33 @@ const controls = {
     },
     loadHistory: function () {
         optimization.loadFromFile();
+    },
+    serverFile: 'lvl20_3324',
+    loadFromServer: function () {
+        const json = serverFiles[controls.serverFile];
+        optimization.load(json.settings, json.generations);
     }
 };
+
+
+
 downloadFolder.add(controls, 'historyFilename').name('Download File Name');
 downloadFolder.add(controls, 'download').name('Download');
 downloadFolder.add(controls, 'loadHistory').name('Load');
+downloadFolder.add(controls, 'serverFile', [
+    'lvl13_6246',
+    'lvl13_6374',
+    'lvl15_5371',
+    'lvl15_5988_fixed4',
+    'lvl15_6615',
+    'lvl19_3624',
+    'lvl19_4588',
+    'lvl20_3324',
+    'lvl20_3390',
+    'lvl20_3840',
+    'lvl20_4459'
+]).name('Server file');
+downloadFolder.add(controls, 'loadFromServer').name('Load from server');
 
 const optimizerFolder = gui.addFolder('Optimizer');
 const optimizerControls = {

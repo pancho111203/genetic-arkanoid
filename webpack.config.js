@@ -2,7 +2,7 @@ module.exports = {
     entry: __dirname + '/src/index.js',
     output: {
         path: __dirname + '/dist',
-        publicPath: '/dist/',
+        publicPath: '/fraruca/webgl/trabajo/dist/',
         filename: 'bundle.js'
     },
     module: {
