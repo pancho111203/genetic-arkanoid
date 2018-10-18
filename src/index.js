@@ -76,6 +76,7 @@ const geneticSettings = {
 const annealingSettings = {
     optimizer: 'annealing',
     level: levelNr,
+    maxBalls: 10,
     initialTemperature: 100,
     maxIterations: 100000,
     coolingFactor: 0.9,
@@ -87,7 +88,7 @@ const annealingSettings = {
 };
 
 const optimization = new Optimization(geneticSettings);
-
+window.optimization = optimization;
 const gui = new dat.GUI();
 
 const serverFiles = {
@@ -177,6 +178,7 @@ annealingFolder.add(annealingSettings, 'level');
 annealingFolder.add(annealingSettings, 'initialTemperature');
 annealingFolder.add(annealingSettings, 'maxIterations');
 annealingFolder.add(annealingSettings, 'coolingFactor');
+annealingFolder.add(annealingSettings, 'maxBalls');
 annealingFolder.add(annealingSettings, 'timestep');
 annealingFolder.add(annealingSettings, 'updatesPerTimestep');
 annealingFolder.add(annealingSettings, 'fitnessFunction');

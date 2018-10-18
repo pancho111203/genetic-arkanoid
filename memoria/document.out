@@ -1,0 +1,17 @@
+\BOOKMARK [1][-]{section.1}{Descripci\363n del problema}{}% 1
+\BOOKMARK [1][-]{section.2}{M\351todos aplicados}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Fitness}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Algoritmo gen\351tico}{section.2}% 4
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Cruce}{subsection.2.2}% 5
+\BOOKMARK [3][-]{subsubsection.2.2.2}{Mutaci\363n}{subsection.2.2}% 6
+\BOOKMARK [3][-]{subsubsection.2.2.3}{Par\341metros}{subsection.2.2}% 7
+\BOOKMARK [2][-]{subsection.2.3}{Enfriamiento simulado}{section.2}% 8
+\BOOKMARK [3][-]{subsubsection.2.3.1}{Funci\363n de sucesor}{subsection.2.3}% 9
+\BOOKMARK [3][-]{subsubsection.2.3.2}{Par\341metros}{subsection.2.3}% 10
+\BOOKMARK [1][-]{section.3}{Implementaci\363n de algoritmos}{}% 11
+\BOOKMARK [1][-]{section.4}{Evaluaci\363n y discusi\363n}{}% 12
+\BOOKMARK [2][-]{subsection.4.1}{Parametrizaci\363n algoritmos gen\351ticos}{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.2}{Parametrizaci\363n enfriamiento simulado}{section.4}% 14
+\BOOKMARK [2][-]{subsection.4.3}{Comparaci\363n}{section.4}% 15
+\BOOKMARK [1][-]{section.5}{Conclusiones y trabajo futuro}{}% 16
+\BOOKMARK [1][-]{section.6}{Anexo: Interfaz desarrollada}{}% 17

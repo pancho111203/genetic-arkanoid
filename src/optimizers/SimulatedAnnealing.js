@@ -1,9 +1,11 @@
-import _ from 'ramda';
+import * as _ from 'ramda';
 import { BALL_LIMITS } from '../globals';
 import { getRandom, getRandomInt, workerLog, clone } from './helpers';
+import Simulation from '../Simulation';
 
 // this.options = {
 //   level: 0,
+//   maxBalls: 10,
 //   initialTemperature: 100,
 //   maxIterations: 100000,
 //   coolingFactor: 0.9,
@@ -47,10 +49,27 @@ class SimmulatedAnnealing {
 
     this.successorFunctions = {
       0: (config) => {
-        if (getRandom(0, 1) > 0.5) {
+        if (config.length > 1 && getRandom(0, 1) > 0.5) {
           config = this.removeRandomBallFromConfig(config);
         }
-        if (getRandom(0, 1) > 0.5) {
+        if (config.length < this.options.maxBalls && getRandom(0, 1) > 0.5) {
+          config = this.addRandomBallToConfig(config);
+        }
+
+        return config;
+      },
+      1: (config) => {
+        for (let ballIndex in config) {
+          const rnd = getRandom(0, 1);
+          if (rnd < 0.2) {
+            config = this.removeBallFromconfig(config, ballIndex);
+            config = this.addRandomBallToConfig(config);
+          }
+        }
+
+        if (config.length > 1 && getRandom(0, 1) > 0.5) {
+          config = this.removeRandomBallFromConfig(config);
+        } else if (config.length < this.options.maxBalls && getRandom(0, 1) > 0.5) {
           config = this.addRandomBallToConfig(config);
         }
 
@@ -61,15 +80,15 @@ class SimmulatedAnnealing {
     this.shouldEnd = false;
   }
 
-  terminate = () => {
+  terminate() {
     this.shouldEnd = true;
   }
 
-  addGenerationCallback = (cb) => {
+  addGenerationCallback(cb) {
     this.generationCallbacks.push(cb);
   }
 
-  generateIndividual = (config) => {
+  generateIndividual(config) {
     return new Promise((resolve, reject) => {
       const levelConfig = [{ levelNr: this.level, balls: config }];
       const simulation = new Simulation(false, levelConfig, this.options.timestep, this.options.updatesPerTimestep);
@@ -80,11 +99,11 @@ class SimmulatedAnnealing {
           reject('Invalid number of results returned');
         }
         const simulationResult = results[0];
-        const fitness = this.fitnessFunctions[this.options.fitnessFunction](simulationResult, config);
+        const fitness = -this.fitnessFunctions[this.options.fitnessFunction](simulationResult, config);
         const individual = {
           config,
           fitness,
-          data: _merge({ nrBalls: config.length }, simulationResult)
+          data: _.merge({ nrBalls: config.length }, simulationResult)
         };
 
         resolve(individual);
@@ -115,17 +134,18 @@ class SimmulatedAnnealing {
           currentIndividual = successor;
         }
         temperature = this.coolTemperature(i, temperature);
+        workerLog('New temperature: ' + temperature);
       }
       if (bestIndividual.fitness < currentIndividual.fitness) {
         bestIndividual = currentIndividual;
-        this.foundNewBest(bestIndividual);
+        this.foundNewBest(bestIndividual, i);
       }
     }
 
     this.sendFinished();
   }
 
-  shouldContinue = (iteration, temperature) => {
+  shouldContinue(iteration, temperature) {
     if (iteration < this.options.maxIterations && !this.shouldEnd) {
       return true;
     }
@@ -154,17 +174,26 @@ class SimmulatedAnnealing {
     return [pos, dir];
   }
 
+  removeBallFromconfig(config, ind) {
+    return _.remove(ind, 1, config);
+
+  }
+
   removeRandomBallFromConfig(config) {
     const ind = getRandomInt(0, config.length);
-    return _.remove(ind, 1, config);
+    return this.removeBallFromconfig(config, ind);
+  }
+
+  addBallToConfig(config, ball) {
+    return _.append(ball, config);
   }
 
   addRandomBallToConfig(config) {
     const ball = this.createRandomBall();
-    return _.append(ball, config);
+    return this.addBallToConfig(config, ball);
   }
 
-  shouldAcceptSuccessor = (temperature, delta) => {
+  shouldAcceptSuccessor(temperature, delta) {
     var C = Math.exp(-delta / temperature);
     var R = Math.random();
 
@@ -175,27 +204,27 @@ class SimmulatedAnnealing {
     return false;
   }
 
-  generateSuccessor = (config) => {
+  generateSuccessor(config) {
     return this.successorFunctions[this.options.successorFunction](config);
   }
 
-coolTemperature = (iteration, temperature) => {
-  return this.coolingFunctions[this.options.coolingFunction](iteration, temperature);
-}
+  coolTemperature(iteration, temperature) {
+    return this.coolingFunctions[this.options.coolingFunction](iteration, temperature);
+  }
 
-foundNewBest = (individual) => {
-  if (this.shouldEnd) return;
-  const stats = {};
-  this.generationCallbacks.forEach((cb) => {
-    cb(individual, stats);
-  });
-}
+  foundNewBest(individual, iteration) {
+    if (this.shouldEnd) return;
+    const stats = {};
+    this.generationCallbacks.forEach((cb) => {
+      cb(Object.assign({}, individual, { iteration }), stats);
+    });
+  }
 
-sendFinished = () => {
-  this.generationCallbacks.forEach((cb) => {
-    cb(null, null, true);
-  });
-}
+  sendFinished() {
+    this.generationCallbacks.forEach((cb) => {
+      cb(null, null, true);
+    });
+  }
 }
 
 export default SimmulatedAnnealing;

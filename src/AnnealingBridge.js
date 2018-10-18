@@ -1,4 +1,4 @@
-import WorkerAlg from './optimizers/genetic.worker.js';
+import WorkerAlg from './optimizers/annealing.worker.js';
 
 class AnnealingBridge {
   constructor() {
